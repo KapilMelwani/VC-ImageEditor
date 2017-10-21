@@ -62,6 +62,8 @@ public class ImageFrame extends JFrame {
 		mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
+		
+		
 		mntmSave = new JMenuItem("Save...");
 		mntmSave.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/com/sun/java/swing/plaf/windows/icons/FloppyDrive.gif")));
 		mntmSave.addActionListener(new ActionListener() {

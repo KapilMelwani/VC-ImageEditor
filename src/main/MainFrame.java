@@ -41,6 +41,7 @@ public class MainFrame extends JFrame {
 	private JPanel contentPane;
 	private JLabel lbCursorInfo;
 	private PixelColorPanel pnMousePixelColor;
+	private JMenuItem mntmSave_1;
 	
 	
 
@@ -93,6 +94,9 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnFile.add(mntmOpen);
+		
+		mntmSave_1 = new JMenuItem("Save...");
+		mnFile.add(mntmSave_1);
 		
 		mntmExit = new JMenuItem("Exit");
 		mntmExit.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/javax/swing/plaf/metal/icons/ocean/close-pressed.gif")));
