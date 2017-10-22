@@ -26,7 +26,7 @@ public class LinearTransformationPanel extends JPanel {
 
 	private static final int MAX_SCORE = 256;
 	private static final int PREF_W = 800;
-	private static final int PREF_H = 650;
+	private static final int PREF_H = 800;
 	private static final int BORDER_GAP = 30;
 	private static final Color GRAPH_COLOR = Color.BLUE;
 	private static final Color GRAPH_POINT_COLOR = Color.GREEN;
@@ -47,15 +47,22 @@ public class LinearTransformationPanel extends JPanel {
 		drag = false;
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-				Point p = translateCoordinates(me.getX(), me.getY());
+				Point p = magnetCoordinates(me.getX(), me.getY());
+				if(!isWithinBounds(p))
+					return;
+				
 				Node node = getNode(p.x, p.y);
 				if(node != null && node.isMoveable()) {
 					drag = true;
 					dragNode = node;
 				}
+				repaint();
 			}
 			public void mouseClicked(MouseEvent me) {
-				Point p = translateCoordinates(me.getX(), me.getY());
+				Point p = magnetCoordinates(me.getX(), me.getY());
+				if(!isWithinBounds(p))
+					return;
+				
 				Node node = getNode(p.x, p.y);
 				if(SwingUtilities.isRightMouseButton(me) && node != null && node.isDeleteable())
 					deleteNode(node);
@@ -71,8 +78,9 @@ public class LinearTransformationPanel extends JPanel {
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent me) {
-				System.out.println(me.getX() + ", " + me.getY());
-				Point p = translateCoordinates(me.getX(), me.getY());
+				Point p = magnetCoordinates(me.getX(), me.getY());
+				if(!isWithinBounds(p))
+					return;
 				if(drag)
 					moveNode(dragNode, p.x, p.y);
 				repaint();
@@ -155,12 +163,46 @@ public class LinearTransformationPanel extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(PREF_W, PREF_H);
 	}
+	
+	public boolean isWithinBounds(Point p) {
+		return isWithinBounds(p.x, p.y);
+	}
+	
+	public boolean isWithinBounds(int x, int y) {
+		if(x >= MAX_SCORE || y >= MAX_SCORE || x < 0 || y < 0)
+			return false;
+		return true;
+	}
 
-	public Point translateCoordinates(int x, int y) {
+	public Point translateCoordinatesDoubleToInt(int x, int y) {
 		double xScale = ((double) getWidth() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
 		double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
 		int xF = (int) ((x - BORDER_GAP) / xScale);
 		int yF = (int) (MAX_SCORE - ((y - BORDER_GAP) / yScale));
+		return new Point(xF, yF);
+	}
+	
+	public Point magnetCoordinates(int x, int y) {
+		double xScale = ((double) getWidth() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
+		double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
+		double xF = (x - BORDER_GAP) / xScale;
+		double yF = MAX_SCORE - ((y - BORDER_GAP) / yScale);
+		System.out.println("xF = " + xF + " | yF = " + yF);
+		int i = (int)(xF);
+		int j = (int)(yF);
+		if((xF - (int)(xF)) > 0.5)
+			i++;
+		if((yF - (int)(yF)) > 0.5)
+			j++;
+		System.out.println("i = " + i + " | j = " + j);
+		return new Point(i, j);
+	}
+	
+	public Point translateCoordinatesIntToDouble(int x, int y) {
+		double xScale = ((double) getWidth() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
+		double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
+		int xF = (int) (x * xScale + BORDER_GAP);
+		int yF = (int) ((MAX_SCORE - y) * yScale + BORDER_GAP);
 		return new Point(xF, yF);
 	}
 
