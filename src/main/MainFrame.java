@@ -236,11 +236,7 @@ public class MainFrame extends JFrame {
 	}
 	
 	private void launchLinearTransFrame(BufferedImage image) {
-		JFrame frame = new JFrame("DrawGraph");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(new LinearTransformationPanel());
-		frame.pack();
-		frame.setLocationByPlatform(true);
+		LinearTranformationFrame frame = new LinearTranformationFrame(focusedFrame);
 		frame.setVisible(true);
 	}
 

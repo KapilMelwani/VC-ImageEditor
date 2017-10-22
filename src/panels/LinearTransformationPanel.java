@@ -17,24 +17,23 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import main.ImageFrame;
+import main.FunctionSegment;
+
 
 public class LinearTransformationPanel extends JPanel {
 
 	private static final int MAX_SCORE = 256;
-	private static final int PREF_W = 800;
-	private static final int PREF_H = 800;
+	private static final int PREF_W = 532;
+	private static final int PREF_H = 532;
 	private static final int BORDER_GAP = 30;
 	private static final Color GRAPH_COLOR = Color.BLUE;
 	private static final Color GRAPH_POINT_COLOR = Color.GREEN;
 	private static final Stroke GRAPH_STROKE = new BasicStroke(3f);
 	private static final int GRAPH_POINT_WIDTH = 12;
 	private static final int Y_HATCH_CNT = 10;
-	private ImageFrame parent;
-	private List<Node> nodes;
+	public List<Node> nodes;
 	private boolean drag;
 	private Node dragNode;
 
@@ -187,14 +186,12 @@ public class LinearTransformationPanel extends JPanel {
 		double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
 		double xF = (x - BORDER_GAP) / xScale;
 		double yF = MAX_SCORE - ((y - BORDER_GAP) / yScale);
-		System.out.println("xF = " + xF + " | yF = " + yF);
 		int i = (int)(xF);
 		int j = (int)(yF);
 		if((xF - (int)(xF)) > 0.5)
 			i++;
 		if((yF - (int)(yF)) > 0.5)
 			j++;
-		System.out.println("i = " + i + " | j = " + j);
 		return new Point(i, j);
 	}
 	
@@ -229,6 +226,16 @@ public class LinearTransformationPanel extends JPanel {
 				return node;
 		}
 		return null;
+	}
+	
+	public List<FunctionSegment> returnSegments() {
+		List<FunctionSegment> list = new ArrayList<FunctionSegment>();
+		for(int i = 1; i < nodes.size(); i++) {
+			Node node1 = nodes.get(i-1);
+			Node node2 = nodes.get(i);
+			list.add(new FunctionSegment(node1.getCoordinates(), node2.getCoordinates()));
+		}
+		return list;
 	}
 
 	private class Node implements Comparable<Object> {
@@ -289,6 +296,10 @@ public class LinearTransformationPanel extends JPanel {
 		public void setCoordinates(int x, int y) {
 			setX(x);
 			setY(y);
+		}
+		
+		public Point getCoordinates() {
+			return new Point(getX(), getY());
 		}
 
 		@Override
