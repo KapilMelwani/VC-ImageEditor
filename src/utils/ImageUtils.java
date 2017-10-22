@@ -35,14 +35,14 @@ public class ImageUtils {
 	}
 	
 	public static String getNameFromPath(String path) {
-		if(path.contains("/"))
+		if(!path.contains("/"))
 			return "";
 		String[] tokens = path.split("/");
 		return tokens[tokens.length-1];
 	}
 	
 	public static String getExtFromName(String filename) {
-		if(filename.contains("."))
+		if(!filename.contains("."))
 			return "";
 		String[] tokens = filename.split(".");
 		return tokens[tokens.length-1];

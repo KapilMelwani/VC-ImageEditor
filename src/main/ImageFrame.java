@@ -1,12 +1,18 @@
 package main;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,7 +35,7 @@ public class ImageFrame extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu mnFile;
 	private JMenuItem mntmSave, mntmExit;
-	
+
 	// OTHERS
 	private BufferedImage image;
 	private ImageFrame parent;
@@ -55,34 +61,6 @@ public class ImageFrame extends JFrame {
 		getPanel().setPreferredSize(getImageScaledDim());
 		setResizable(false);
 		pack();
-		
-		menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-		
-		mntmSave = new JMenuItem("Save...");
-		mntmSave.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/com/sun/java/swing/plaf/windows/icons/FloppyDrive.gif")));
-		mntmSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-				int returnValue = jfc.showSaveDialog(null);
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					System.out.println("Saving to " + selectedFile.getAbsolutePath());
-					try {
-						ImageIO.write(image, getFormat(), new File(selectedFile.getAbsolutePath()));
-					} catch (IOException e1) { e1.printStackTrace(); }
-				}
-
-			}
-		});
-		mnFile.add(mntmSave);
-		
-		mntmExit = new JMenuItem("Exit");
-		mntmExit.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/javax/swing/plaf/metal/icons/ocean/close-pressed.gif")));
-		mnFile.add(mntmExit);
 	}
 
 	public BufferedImage getImage() {

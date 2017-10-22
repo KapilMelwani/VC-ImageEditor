@@ -2,6 +2,7 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -14,6 +15,8 @@ import main.ImageFrame.ImagePanel;
 import panels.PixelColorPanel;
 
 import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
+
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -24,10 +27,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class MainFrame extends JFrame {
@@ -42,7 +50,7 @@ public class MainFrame extends JFrame {
 	private JLabel lbCursorInfo;
 	private PixelColorPanel pnMousePixelColor;
 	
-	
+	private ImageFrame focusedFrame;
 
 	/**
 	 * Launch the application.
@@ -66,7 +74,7 @@ public class MainFrame extends JFrame {
 	public MainFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		
+		focusedFrame = null;
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
@@ -94,6 +102,27 @@ public class MainFrame extends JFrame {
 		});
 		mnFile.add(mntmOpen);
 		
+		mntmSave = new JMenuItem("Save...");
+		mntmSave.setSelectedIcon(
+				new ImageIcon(MainFrame.class.getResource("/com/sun/java/swing/plaf/windows/icons/FloppyDrive.gif")));
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+				int returnValue = jfc.showSaveDialog(null);
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = jfc.getSelectedFile();
+					System.out.println("Saving to " + selectedFile.getAbsolutePath());
+					try {
+						ImageIO.write(focusedFrame.getImage(), focusedFrame.getFormat(), new File(selectedFile.getAbsolutePath()));
+					} catch (IOException e1) { e1.printStackTrace(); }
+				}
+
+			}
+		});
+		mnFile.add(mntmSave);
+		
 		mntmExit = new JMenuItem("Exit");
 		mntmExit.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/javax/swing/plaf/metal/icons/ocean/close-pressed.gif")));
 		mnFile.add(mntmExit);
@@ -111,26 +140,15 @@ public class MainFrame extends JFrame {
 		pnInfo.add(lbCursorInfo);
 
 		JButton btnImage = new JButton("Image");
-		btnImage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-				int returnValue = jfc.showOpenDialog(null);
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					System.out.println(selectedFile.getAbsolutePath());
-					createNewImageFrame(selectedFile.getAbsolutePath());
-				}
-
-			}
-		});
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		pnMousePixelColor = new PixelColorPanel();
 		aux.add(pnMousePixelColor);
 		aux.add(btnImage);
 		pnInfo.add(aux);
 		pack();
-		setSize(getWidth() * 3, getHeight());
+		setSize(getWidth() * 2, getHeight());
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new FocusChangeListener());
+
 	}
 
 	private void createNewImageFrame(String file) {
@@ -181,5 +199,31 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	class FocusChangeListener implements PropertyChangeListener {
+		public void propertyChange(PropertyChangeEvent evt) {
+			Component oldComp = (Component) evt.getOldValue();
+			Component newComp = (Component) evt.getNewValue();
+
+			if(!(newComp instanceof ImageFrame) && !(newComp instanceof MainFrame))
+				return;
+			else if(newComp instanceof ImageFrame)
+				focusedFrame = (ImageFrame) newComp;
+				
+			
+			if ("focusOwner".equals(evt.getPropertyName())) {
+				if (oldComp == null) {
+					System.out.println(newComp.getName());
+				} else {
+					System.out.println(oldComp.getName());
+				}
+			} else if ("focusedWindow".equals(evt.getPropertyName())) {
+				if (oldComp == null) {
+					System.out.println(newComp.getName());
+				} else {
+					System.out.println(oldComp.getName());
+				}
+			}
+		}
+	}
 
 }
