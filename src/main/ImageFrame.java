@@ -1,19 +1,29 @@
 package main;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -25,11 +35,8 @@ import utils.ImageUtils;
 
 public class ImageFrame extends JFrame {
 
-	// JMENU
-	private JMenuBar menuBar;
-	private JMenu mnFile;
-	private JMenuItem mntmSave, mntmExit;
-	
+	private JLabel lbInfo;
+
 	// OTHERS
 	private BufferedImage image;
 	private ImageFrame parent;
@@ -47,44 +54,18 @@ public class ImageFrame extends JFrame {
 		setImage(image);
 		setParent(parent);
 		setPanel(new ImagePanel(image));
+		setLbInfo(new JLabel());
+		refreshImageInfo();
 		if (parent != null)
 			setPath(parent.path);
 		setImageScaledDim(ImageUtils.scaleImage(getImageDimension()));
 
-		add(getPanel());
+		add(getPanel(), BorderLayout.CENTER);
 		getPanel().setPreferredSize(getImageScaledDim());
+		add(getLbInfo(), BorderLayout.NORTH);
 		setResizable(false);
 		pack();
-		
-		menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-		
-		
-		
-		mntmSave = new JMenuItem("Save...");
-		mntmSave.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/com/sun/java/swing/plaf/windows/icons/FloppyDrive.gif")));
-		mntmSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-				int returnValue = jfc.showSaveDialog(null);
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					System.out.println("Saving to " + selectedFile.getAbsolutePath());
-					try {
-						ImageIO.write(image, getFormat(), new File(selectedFile.getAbsolutePath()));
-					} catch (IOException e1) { e1.printStackTrace(); }
-				}
-
-			}
-		});
-		mnFile.add(mntmSave);
-		
-		mntmExit = new JMenuItem("Exit");
-		mntmExit.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/javax/swing/plaf/metal/icons/ocean/close-pressed.gif")));
-		mnFile.add(mntmExit);
+		System.out.println(getFileSize());
 	}
 
 	public BufferedImage getImage() {
@@ -127,6 +108,14 @@ public class ImageFrame extends JFrame {
 		this.path = path;
 	}
 
+	public JLabel getLbInfo() {
+		return lbInfo;
+	}
+
+	public void setLbInfo(JLabel lbInfo) {
+		this.lbInfo = lbInfo;
+	}
+
 	public Dimension getImageDimension() {
 		return new Dimension(getImage().getWidth(), getImage().getHeight());
 	}
@@ -137,6 +126,24 @@ public class ImageFrame extends JFrame {
 
 	public String getFormat() {
 		return ImageUtils.getExtFromName(getFileName());
+	}
+
+	public String getResolution() {
+		return getImage().getWidth() + "x" + getImage().getHeight();
+	}
+
+	public void refreshImageInfo() {
+		getLbInfo().setText(getResolution() + " pixels; " + getFileSize());
+	}
+
+	public String getFileSize() {
+		DataBuffer buff = getImage().getRaster().getDataBuffer();
+		int bytes = buff.getSize() * DataBuffer.getDataTypeSize(buff.getDataType()) / 8;
+		
+		if (bytes <= 0) return "0";
+	    final String[] units = new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
+	    int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+	    return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
 	public class ImagePanel extends JPanel {
