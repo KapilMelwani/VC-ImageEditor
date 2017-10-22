@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -37,6 +38,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JRadioButtonMenuItem;
 
 public class MainFrame extends JFrame {
 	
@@ -51,6 +53,8 @@ public class MainFrame extends JFrame {
 	private PixelColorPanel pnMousePixelColor;
 	
 	private ImageFrame focusedFrame;
+	private JMenu mnEdit;
+	private JMenuItem mntmColor;
 
 	/**
 	 * Launch the application.
@@ -127,6 +131,15 @@ public class MainFrame extends JFrame {
 		mntmExit.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/javax/swing/plaf/metal/icons/ocean/close-pressed.gif")));
 		mnFile.add(mntmExit);
 		
+		mnEdit = new JMenu("Edit");
+		menuBar.add(mnEdit);
+		
+		mntmColor = new JMenuItem("Color");
+		final JPopupMenu a = new JPopupMenu();
+		a.add(new JMenuItem("RGB"));
+		mntmColor.add(a);
+		mnEdit.add(mntmColor);
+		
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -192,10 +205,10 @@ public class MainFrame extends JFrame {
 				return;
 			Color color = new Color(aux.getImage().getRGB(x, y));
 			colorPanel.setColor(color);
-			label.setText(	"x = " + x +
+			label.setText(	"<html>x = " + x +
 					", y = " + y +
-					", [" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + "] " +
-					String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()));
+					", [<font color='red'>" + color.getRed() + "</font>, <font color='green'>" + color.getGreen() + "</font>, <font color='blue'>" + color.getBlue() + "</font>] " +
+					String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()) + "</html>");
 		}
 	}
 
