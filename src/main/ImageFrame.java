@@ -12,7 +12,9 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.PixelGrabber;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -56,9 +58,9 @@ public class ImageFrame extends JFrame {
 		setPanel(new ImagePanel(image));
 		setLbInfo(new JLabel());
 		refreshImageInfo();
+		setImageScaledDim(ImageUtils.scaleImage(getImageDimension()));
 		if (parent != null)
 			setPath(parent.path);
-		setImageScaledDim(ImageUtils.scaleImage(getImageDimension()));
 
 		add(getPanel(), BorderLayout.CENTER);
 		getPanel().setPreferredSize(getImageScaledDim());
@@ -139,11 +141,12 @@ public class ImageFrame extends JFrame {
 	public String getFileSize() {
 		DataBuffer buff = getImage().getRaster().getDataBuffer();
 		int bytes = buff.getSize() * DataBuffer.getDataTypeSize(buff.getDataType()) / 8;
-		
-		if (bytes <= 0) return "0";
-	    final String[] units = new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
-	    int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
-	    return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+
+		if (bytes <= 0)
+			return "0";
+		final String[] units = new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
+		int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+		return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
 	public class ImagePanel extends JPanel {

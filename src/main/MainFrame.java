@@ -13,6 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import main.ImageFrame.ImagePanel;
+import panels.LinearTransformationPanel;
 import panels.PixelColorPanel;
 import utils.ImageUtils;
 
@@ -49,7 +50,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -98,7 +99,7 @@ public class MainFrame extends JFrame {
 				jfc.setDialogTitle("Select an image");
 				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				jfc.setAcceptAllFileFilterUsed(false);
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "jpg");
 				jfc.addChoosableFileFilter(filter);
 				int returnValue = jfc.showOpenDialog(null);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -178,6 +179,16 @@ public class MainFrame extends JFrame {
 		});	    
 		mnEdit.add(mntmHistogram);
 		
+		mntmLinearTrans = new JMenuItem("Linear Transformation");
+		mntmLinearTrans.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				launchLinearTransFrame(focusedFrame.getImage());
+			}
+		});	    
+		mnEdit.add(mntmLinearTrans);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -221,6 +232,15 @@ public class MainFrame extends JFrame {
 		frame.add(new JScrollPane(new HistogramPanel(image)));
 		frame.pack();
 		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+	
+	private void launchLinearTransFrame(BufferedImage image) {
+		JFrame frame = new JFrame("DrawGraph");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(new LinearTransformationPanel());
+		frame.pack();
+		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
 	}
 

@@ -10,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
@@ -19,58 +21,50 @@ import javax.swing.SwingUtilities;
 import utils.ImageUtils;
 
 public class HistogramPanel extends JPanel {
-	
+
 	protected static final int MIN_BAR_WIDTH = 4;
-	private int[][] rgbValues;
 	private JPopupMenu popup;
-	private JCheckBoxMenuItem red, green, blue;
-	private boolean showRed, showGreen, showBlue;
+
+	private List<HistogramLayer> layers;
+	private ImageFrame parent;
 
 	public HistogramPanel(BufferedImage image) {
-		this.rgbValues = ImageUtils.getRGBValues(image);
-		/*
-		 * for (int i = 0; i < 3; i++) { for (int j = 0; j < 256; j++) {
-		 * System.out.print(rgbValues[i][j] + " "); } System.out.println(); }
-		 */
+		int[][] rgbValues = ImageUtils.getRGBValues(image);
+		layers = new ArrayList<HistogramLayer>();
+
 		int width = (256 * MIN_BAR_WIDTH) + 11;
-		Dimension minSize = new Dimension(width, 128);
-		Dimension prefSize = new Dimension(width, 256);
-		setMinimumSize(minSize);
-		setPreferredSize(prefSize);
-		if(ImageUtils.isGrayscale(rgbValues))
-			return;
-		showRed = true;
-		showGreen = true;
-		showBlue = true;
-		
+		setMinimumSize(new Dimension(width, 128));
+		setPreferredSize(new Dimension(width, 256));
+
 		popup = new JPopupMenu("Edit");
-		red = new JCheckBoxMenuItem("Red", showRed);
-		green = new JCheckBoxMenuItem("Green", showGreen);
-		blue = new JCheckBoxMenuItem("Blue", showBlue);
+		if (image.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+			newHistogramLayer(rgbValues[0], Color.RED, true, "Red");
+			newHistogramLayer(rgbValues[1], Color.GREEN, true, "Green");
+			newHistogramLayer(rgbValues[2], Color.BLUE, true, "Blue");
+			newHistogramLayer(ImageUtils.getGrayValues(rgbValues), Color.DARK_GRAY, false, "Histogram");
+		}
+		else
+			newHistogramLayer(rgbValues[0], Color.DARK_GRAY, true, "Histogram");
 		
-		popup.add(red);
-		popup.add(green);
-		popup.add(blue);
-		
-		setListeners();
+		addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+
+		});
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawBorder(g);
-		if (ImageUtils.isGrayscale(rgbValues))
-			drawColorHistogram(rgbValues[0], g, 3);
-		else {
-			if(showRed)
-				drawColorHistogram(rgbValues[0], g, 0);
-			if(showGreen)
-				drawColorHistogram(rgbValues[1], g, 1);
-			if(showBlue)
-				drawColorHistogram(rgbValues[2], g, 2);
-		}
+		for (HistogramLayer layer : layers)
+			if (layer.isVisible())
+				drawHistogramLayer(g, layer);
 	}
-	
+
 	private void drawBorder(Graphics g) {
 		int xOffset = 5;
 		int yOffset = 5;
@@ -81,43 +75,41 @@ public class HistogramPanel extends JPanel {
 		g2d.drawRect(xOffset, yOffset, width, height);
 	}
 
-	private void drawColorHistogram(int[] color, Graphics g, int rgb) {
-		if (color != null) {
+	private void newHistogramLayer(int[] values, Color color, boolean visible, String text) {
+		HistogramLayer newLayer = new HistogramLayer(values, color, visible);
+		JCheckBoxMenuItem newCheckBoxMenuItem = new JCheckBoxMenuItem(text, visible);
+		newCheckBoxMenuItem.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				newLayer.setVisible(newCheckBoxMenuItem.getState());
+				repaint();
+			}
+		});
+		popup.add(newCheckBoxMenuItem);
+		layers.add(newLayer);
+	}
+
+	private void drawHistogramLayer(Graphics g, HistogramLayer layer) {
+		if (layer != null) {
 			int xOffset = 5;
 			int yOffset = 5;
 			int width = getWidth() - 1 - (xOffset * 2);
 			int height = getHeight() - 1 - (yOffset * 2);
 			Graphics2D g2d = (Graphics2D) g.create();
-			int barWidth = Math.max(MIN_BAR_WIDTH, (int) Math.floor((float) width / (float) color.length));
+			int barWidth = Math.max(MIN_BAR_WIDTH, (int) Math.floor((float) width / (float) layer.getValues().length));
 			int maxValue = 0;
-			for (Integer value : color) {
+			for (Integer value : layer.getValues()) {
 				maxValue = Math.max(maxValue, value);
 			}
 			int xPos = xOffset;
-			for (int i = 0; i < color.length; i++) {
-				int value = color[i];
+			for (int i = 0; i < layer.getValues().length; i++) {
+				int value = layer.getValues()[i];
 				int barHeight = Math.round(((float) value / (float) maxValue) * height);
 				g2d.setColor(new Color(i, i, i));
 				int yPos = height + yOffset - barHeight;
 				// Rectangle bar = new Rectangle(xPos, yPos, barWidth, barHeight);
 				Rectangle2D bar = new Rectangle2D.Float(xPos, yPos, barWidth, barHeight);
 				g2d.fill(bar);
-				switch (rgb) {
-				case 0:
-					g2d.setColor(Color.RED);
-					break;
-				case 1:
-					g2d.setColor(Color.GREEN);
-					break;
-				case 2:
-					g2d.setColor(Color.BLUE);
-					break;
-				case 3:
-					g2d.setColor(Color.DARK_GRAY);
-					break;
-				default:
-					break;
-				}
+				g2d.setColor(layer.getColor());
 
 				g2d.draw(bar);
 				xPos += barWidth;
@@ -126,33 +118,20 @@ public class HistogramPanel extends JPanel {
 		}
 	}
 
-	private void setListeners() {
-		addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (SwingUtilities.isRightMouseButton(e)) {
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				}
-			}
+	public ImageFrame getParentFrame() {
+		return parent;
+	}
 
-		});
-		red.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				showRed = red.getState();
-				repaint();
-			}
-		});
-		green.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				showGreen = green.getState();
-				repaint();
-			}
-		});
-		blue.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				showBlue = blue.getState();
-				repaint();
-			}
-		});
+	public void setParent(ImageFrame parent) {
+		this.parent = parent;
+	}
+
+	public List<HistogramLayer> getLayers() {
+		return layers;
+	}
+
+	public void setLayers(List<HistogramLayer> layers) {
+		this.layers = layers;
 	}
 
 }

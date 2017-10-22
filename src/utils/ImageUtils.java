@@ -65,7 +65,7 @@ public class ImageUtils {
 	}
 
 	public static BufferedImage rgbToGrayscaleCopy(BufferedImage original) {
-		BufferedImage image = deepCopy(original);
+		BufferedImage image = new BufferedImage(0, 0, 0, null);
 		for (int i = 0; i < image.getWidth(); i++)
 			for (int j = 0; j < image.getHeight(); j++) {
 				Color color = new Color(image.getRGB(i, j));
@@ -105,6 +105,32 @@ public class ImageUtils {
 			}
 		}
 		return data;
+	}
+	
+	public static int[] getGrayValues(BufferedImage image) {
+		int[] values = new int[256];
+		int index = 0;
+		for (int i = 0; i < image.getWidth(); i++)
+			for (int j = 0; j < image.getHeight(); j++) {
+				Color color = new Color(image.getRGB(i, j));
+				int red = (int) (color.getRed() * 0.299);
+				int green = (int) (color.getGreen() * 0.587);
+				int blue = (int) (color.getBlue() * 0.114);
+				values[index++] = red + green + blue;
+			}
+		return values;
+	}
+	
+	public static int[] getGrayValues(int[][] image) {
+		int[] values = new int[256];
+		int index = 0;
+		for (int i = 0; i < 256; i++) {
+			int red = 	(int) (image[0][i] * 0.299);
+			int green = (int) (image[1][i] * 0.587);
+			int blue = 	(int) (image[2][i] * 0.114);
+			values[index++] = red + green + blue;
+		}
+		return values;
 	}
 
 	public static boolean isGrayscale(int[][] data) {
