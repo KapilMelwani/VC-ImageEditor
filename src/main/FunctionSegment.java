@@ -29,7 +29,13 @@ public class FunctionSegment {
 	public double f(double x) {
 		return getM() * x + getB();
 	}
+	public String stringFunction() {
+		return "y = " + String.format("%.2f", getM()) + "x + " + String.format("%.2f", getB());
+	}
+	public String stringPoints() {
+		return "[(" + p1.x + ", " + p1.y + ") --> (" + p2.x + ", " + p2.y + ")]";
+	}
 	public String toString() {
-		return "y = " + getM() + "x + " + getB() + " | [(" + p1.x + ", " + p1.y + ") --> (" + p2.x + ", " + p2.y + ")]";
+		return "y = " + String.format("%.2f", getM()) + "x + " + String.format("%.2f", getB()) + " | [(" + p1.x + ", " + p1.y + ") --> (" + p2.x + ", " + p2.y + ")]";
 	}
 }

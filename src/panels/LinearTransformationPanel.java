@@ -1,10 +1,12 @@
 package panels;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -16,10 +18,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import main.FunctionSegment;
+import main.LinearTranformationFrame;
 
 
 public class LinearTransformationPanel extends JPanel {
@@ -33,9 +39,11 @@ public class LinearTransformationPanel extends JPanel {
 	private static final Stroke GRAPH_STROKE = new BasicStroke(3f);
 	private static final int GRAPH_POINT_WIDTH = 12;
 	private static final int Y_HATCH_CNT = 10;
-	public List<Node> nodes;
+	private List<Node> nodes;
 	private boolean drag;
 	private Node dragNode;
+	
+	private JPanel info;
 
 	public LinearTransformationPanel() {
 		this.nodes = new ArrayList<Node>();
@@ -85,6 +93,13 @@ public class LinearTransformationPanel extends JPanel {
 				repaint();
 			}
 		});
+		info = new JPanel();
+		info.setLayout(new GridLayout(nodes.size()-1, 1));
+		for(FunctionSegment segment : returnSegments()) {
+			info.add(new JLabel(segment.toString()), BorderLayout.SOUTH);
+			info.repaint();
+		}
+		add(info, BorderLayout.SOUTH);
 	}
 
 	@Override
@@ -156,6 +171,21 @@ public class LinearTransformationPanel extends JPanel {
 			int ovalH = GRAPH_POINT_WIDTH;
 			g2.fillOval(x, y, ovalW, ovalH);
 		}
+		info.removeAll();
+		info.setLayout(new GridLayout(nodes.size()-1, 1));
+		for(FunctionSegment segment : returnSegments()) {
+			System.out.println(segment);
+			JPanel aux = new JPanel(new GridLayout(1,2));
+			JLabel lb1 = new JLabel(segment.stringFunction());
+			JLabel lb2 = new JLabel(segment.stringPoints());
+			lb1.setHorizontalAlignment(SwingConstants.CENTER);
+			lb2.setHorizontalAlignment(SwingConstants.CENTER);
+			aux.add(lb1);
+			aux.add(lb2);
+			info.add(aux);
+			info.repaint();
+		}
+		((JFrame) SwingUtilities.getWindowAncestor(this)).pack();
 	}
 
 	@Override
@@ -230,12 +260,20 @@ public class LinearTransformationPanel extends JPanel {
 	
 	public List<FunctionSegment> returnSegments() {
 		List<FunctionSegment> list = new ArrayList<FunctionSegment>();
+		//System.out.println(nodes);
 		for(int i = 1; i < nodes.size(); i++) {
 			Node node1 = nodes.get(i-1);
 			Node node2 = nodes.get(i);
+			//System.out.println("Node1 = " + node1);
+			//System.out.println("Node2 = " + node2);
 			list.add(new FunctionSegment(node1.getCoordinates(), node2.getCoordinates()));
 		}
+		//System.out.println("FIN");
 		return list;
+	}
+	
+	public List<Node> getNodes() { 
+		return this.nodes;
 	}
 
 	private class Node implements Comparable<Object> {
@@ -300,6 +338,10 @@ public class LinearTransformationPanel extends JPanel {
 		
 		public Point getCoordinates() {
 			return new Point(getX(), getY());
+		}
+		
+		public String toString() {
+			return "Node (" + this.hashCode() + ") = (" + getX() + ", " + getY() + ")";
 		}
 
 		@Override

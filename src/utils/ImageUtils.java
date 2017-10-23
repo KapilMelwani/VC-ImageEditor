@@ -65,7 +65,7 @@ public class ImageUtils {
 	}
 
 	public static BufferedImage rgbToGrayscaleCopy(BufferedImage original) {
-		BufferedImage image = new BufferedImage(0, 0, 0, null);
+		BufferedImage image = deepCopy(original);
 		for (int i = 0; i < image.getWidth(); i++)
 			for (int j = 0; j < image.getHeight(); j++) {
 				Color color = new Color(image.getRGB(i, j));

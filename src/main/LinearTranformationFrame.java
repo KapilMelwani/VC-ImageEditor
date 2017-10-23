@@ -1,15 +1,9 @@
 package main;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
-import panels.LTInfoPanel;
 import panels.LinearTransformationPanel;
 
 public class LinearTranformationFrame extends JFrame {
@@ -22,7 +16,6 @@ public class LinearTranformationFrame extends JFrame {
 		setParent(parent);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().add(getPanel(), BorderLayout.CENTER);
-		getContentPane().add(new LTInfoPanel(getPanel().returnSegments()), BorderLayout.SOUTH);
 		setLocationByPlatform(true);
 		setResizable(false);
 		pack();
