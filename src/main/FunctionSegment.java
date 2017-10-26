@@ -2,7 +2,7 @@ package main;
 
 import java.awt.Point;
 
-public class FunctionSegment {
+public class FunctionSegment implements Comparable {
 	Point p1, p2;
 	public FunctionSegment(Point a, Point b) {
 		setP1(a);
@@ -37,5 +37,9 @@ public class FunctionSegment {
 	}
 	public String toString() {
 		return "y = " + String.format("%.2f", getM()) + "x + " + String.format("%.2f", getB()) + " | [(" + p1.x + ", " + p1.y + ") --> (" + p2.x + ", " + p2.y + ")]";
+	}
+	@Override
+	public int compareTo(Object o) {
+		return (int) (getP1().getX() - ((FunctionSegment)o).getP1().getX());
 	}
 }

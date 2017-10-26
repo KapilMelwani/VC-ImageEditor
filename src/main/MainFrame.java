@@ -162,7 +162,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				createNewImageFrame(ImageUtils.rgbToGrayscaleCopy(focusedFrame.getImage()));
+				createNewImageFrame(ImageUtils.rgbToGrayscaleCopyAuto(focusedFrame.getImage()), focusedFrame);
 			}
 		});
 	    mntmColor.add(mntmToGrayscale);
@@ -174,7 +174,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				launchHistogramFrame(focusedFrame.getImage());
+				ImageUtils.launchHistogramFrame(focusedFrame.getImage());
 			}
 		});	    
 		mnEdit.add(mntmHistogram);
@@ -184,7 +184,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				launchLinearTransFrame(focusedFrame.getImage());
+				ImageUtils.launchLinearTransFrame(focusedFrame.getImage(), focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmLinearTrans);
@@ -211,79 +211,24 @@ public class MainFrame extends JFrame {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new FocusChangeListener());
 
 	}
-
-	private void createNewImageFrame(String file) {
+	
+	public void createNewImageFrame(String file) {
 		ImageFrame frame = new ImageFrame(file);
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 	
-	private void createNewImageFrame(BufferedImage image) {
-		ImageFrame frame = new ImageFrame(image, focusedFrame);
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+	public void createNewImageFrame(BufferedImage image, ImageFrame parent) {
+		ImageFrame frame = new ImageFrame(image, parent);
+		//frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-	}
-	
-	private void launchHistogramFrame(BufferedImage image) {
-		JFrame frame = new JFrame("Histogram");
-		frame.setLayout(new BorderLayout());
-		frame.add(new JScrollPane(new HistogramPanel(image)));
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-	}
-	
-	private void launchLinearTransFrame(BufferedImage image) {
-		LinearTranformationFrame frame = new LinearTranformationFrame(focusedFrame);
-		frame.setVisible(true);
-	}
-
-	public class MousePixelListener implements MouseMotionListener {
-
-		private JLabel label;
-		private PixelColorPanel colorPanel;
-
-		public MousePixelListener(JLabel label, PixelColorPanel colorPanel) {
-			this.label = label;
-			this.colorPanel = colorPanel;
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			ImagePanel aux = (ImagePanel)e.getComponent();
-			int x = (int) (e.getX() * aux.getScale());
-			int y = (int) (e.getY() * aux.getScale());
-			if(x > aux.getImage().getWidth() || x < 0 || y > aux.getImage().getHeight() || y < 0)
-				return;
-			Color color = new Color(aux.getImage().getRGB(x, y));
-			colorPanel.setColor(color);
-			label.setText(	"x = " + x +
-							", y = " + y +
-							", [" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + "] " +
-							String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()));
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			ImagePanel aux = (ImagePanel)e.getComponent();
-			int x = (int) (e.getX() * aux.getScale());
-			int y = (int) (e.getY() * aux.getScale());
-			if(x > aux.getImage().getWidth() || x < 0 || y > aux.getImage().getHeight() || y < 0)
-				return;
-			Color color = new Color(aux.getImage().getRGB(x, y));
-			colorPanel.setColor(color);
-			label.setText(	"<html>x = " + x +
-					", y = " + y +
-					", [<font color='red'>" + color.getRed() + "</font>, <font color='green'>" + color.getGreen() + "</font>, <font color='blue'>" + color.getBlue() + "</font>] " +
-					String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()) + "</html>");
-		}
 	}
 
 	class FocusChangeListener implements PropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent evt) {
-			Component oldComp = (Component) evt.getOldValue();
+			//Component oldComp = (Component) evt.getOldValue();
 			Component newComp = (Component) evt.getNewValue();
 
 			if(!(newComp instanceof ImageFrame))
@@ -291,7 +236,7 @@ public class MainFrame extends JFrame {
 			else if(newComp instanceof ImageFrame)
 				focusedFrame = (ImageFrame) newComp;
 				
-			
+			/*
 			if ("focusOwner".equals(evt.getPropertyName())) {
 				if (oldComp == null) {
 					System.out.println(newComp.getName());
@@ -304,7 +249,7 @@ public class MainFrame extends JFrame {
 				} else {
 					System.out.println(oldComp.getName());
 				}
-			}
+			}*/
 		}
 	}
 

@@ -1,15 +1,32 @@
 package utils;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+
+import main.FunctionSegment;
+import main.HistogramPanel;
+import main.ImageFrame;
+import main.LinearTranformationFrame;
+import main.Node;
+import main.NodeList;
+import main.MousePixelListener;
+import panels.PixelColorPanel;
 
 public class ImageUtils {
 
@@ -45,11 +62,35 @@ public class ImageUtils {
 	}
 
 	public static String getExtFromName(String filename) {
-	    try {
-	        return filename.substring(filename.lastIndexOf(".") + 1);
-	    } catch (Exception e) {
-	        return "";
-	    }
+		try {
+			return filename.substring(filename.lastIndexOf(".") + 1);
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	/**
+	 * [0] = RED
+	 * [1] = GREEN
+	 * [2] = BLUE
+	 * [3] = ALPHA
+	 * @param color
+	 * @return
+	 */
+	public static int[] intToRGB(int color) {
+		int[] rgba = new int[4];
+		rgba[0] = (color) & 0xFF;
+		rgba[1] = (color >> 8) & 0xFF;
+		rgba[2] = (color >> 16) & 0xFF;
+		rgba[3] = (color >> 24) & 0xFF;
+		return rgba;
+	}
+	
+	public static int rgbToInt(int Red, int Green, int Blue){
+	    Red = (Red << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
+	    Green = (Green << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
+	    Blue = Blue & 0x000000FF; //Mask out anything not blue.
+	    return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
 	}
 
 	public static void rgbToGrayscale(BufferedImage image) {
@@ -77,14 +118,40 @@ public class ImageUtils {
 			}
 		return image;
 	}
-	
+
+	public static BufferedImage rgbToGrayscaleCopyAuto(BufferedImage original) {
+		BufferedImage image = new BufferedImage(original.getWidth(), original.getHeight(),
+				BufferedImage.TYPE_BYTE_GRAY);
+		Graphics g = image.getGraphics();
+		g.drawImage(original, 0, 0, null);
+		g.dispose();
+		return image;
+	}
+
+	public static BufferedImage linearTransform(BufferedImage original, List<FunctionSegment> f) {
+		BufferedImage image = rgbToGrayscaleCopyAuto(original);
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				int value = ImageUtils.intToRGB(image.getRGB(row, col))[0];
+				for(FunctionSegment segment : f) {
+					if(segment.getP1().getX() < value) {
+						value = (int) segment.f(value);
+						break;
+					}
+				}
+				image.setRGB(row, col, ImageUtils.rgbToInt(value, value, value));
+			}
+		}
+		return image;
+	}
+
 	public static BufferedImage deepCopy(BufferedImage bi) {
 		ColorModel cm = bi.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-	
+
 	public static int[][] getRGBValues(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -106,7 +173,7 @@ public class ImageUtils {
 		}
 		return data;
 	}
-	
+
 	public static int[] getGrayValues(BufferedImage image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -120,14 +187,14 @@ public class ImageUtils {
 			}
 		return values;
 	}
-	
+
 	public static int[] getGrayValues(int[][] image) {
 		int[] values = new int[256];
 		int index = 0;
 		for (int i = 0; i < 256; i++) {
-			int red = 	(int) (image[0][i] * 0.299);
+			int red = (int) (image[0][i] * 0.299);
 			int green = (int) (image[1][i] * 0.587);
-			int blue = 	(int) (image[2][i] * 0.114);
+			int blue = (int) (image[2][i] * 0.114);
 			values[index++] = red + green + blue;
 		}
 		return values;
@@ -143,6 +210,54 @@ public class ImageUtils {
 			b++;
 		}
 		return true;
+	}
+
+	public static List<FunctionSegment> returnSegments(List<Node> nodes) {
+		Collections.sort(nodes);
+		List<FunctionSegment> list = new ArrayList<FunctionSegment>();
+		for (int i = 1; i < nodes.size(); i++) {
+			Node node1 = nodes.get(i - 1);
+			Node node2 = nodes.get(i);
+			list.add(new FunctionSegment(node1.getCoordinates(), node2.getCoordinates()));
+		}
+		Collections.sort(list);
+		return list;
+	}
+
+	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
+			PixelColorPanel pnMousePixelColor) {
+		ImageFrame frame = new ImageFrame(image, parent);
+		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+	
+	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, MousePixelListener listener) {
+		ImageFrame frame = new ImageFrame(image, parent);
+		frame.getPanel().addMouseMotionListener(new MousePixelListener(listener.getLabel(), listener.getColorPanel()));
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	public static void createNewImageFrame(ImageFrame parent, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
+		ImageFrame frame = new ImageFrame(parent.getImage(), parent);
+		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	public static void launchHistogramFrame(BufferedImage image) {
+		JFrame frame = new JFrame("Histogram");
+		frame.setLayout(new BorderLayout());
+		frame.add(new JScrollPane(new HistogramPanel(image)));
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	public static void launchLinearTransFrame(BufferedImage image, ImageFrame parent) {
+		LinearTranformationFrame frame = new LinearTranformationFrame(parent);
+		frame.setVisible(true);
 	}
 
 }

@@ -23,9 +23,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 
 import main.FunctionSegment;
 import main.LinearTranformationFrame;
+import main.Node;
+import main.NodeList;
 
 
 public class LinearTransformationPanel extends JPanel {
@@ -39,14 +42,13 @@ public class LinearTransformationPanel extends JPanel {
 	private static final Stroke GRAPH_STROKE = new BasicStroke(3f);
 	private static final int GRAPH_POINT_WIDTH = 12;
 	private static final int Y_HATCH_CNT = 10;
-	private List<Node> nodes;
+	//private List<Node> nodes;
+	private NodeList nodes;
 	private boolean drag;
 	private Node dragNode;
 	
-	private JPanel info;
-
 	public LinearTransformationPanel() {
-		this.nodes = new ArrayList<Node>();
+		this.nodes = new NodeList();
 		Node start = new Node(0, 0, false, false, false);
 		Node end = new Node(255, 255, false, false, false);
 		nodes.add(start);
@@ -93,13 +95,6 @@ public class LinearTransformationPanel extends JPanel {
 				repaint();
 			}
 		});
-		info = new JPanel();
-		info.setLayout(new GridLayout(nodes.size()-1, 1));
-		for(FunctionSegment segment : returnSegments()) {
-			info.add(new JLabel(segment.toString()), BorderLayout.SOUTH);
-			info.repaint();
-		}
-		add(info, BorderLayout.SOUTH);
 	}
 
 	@Override
@@ -137,7 +132,7 @@ public class LinearTransformationPanel extends JPanel {
 		double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
 
 		List<Point> graphPoints = new ArrayList<Point>();
-		for (Node node : nodes) {
+		for (Node node : nodes.getList()) {
 			int x1 = (int) (node.getX() * xScale + BORDER_GAP);
 			int y1 = (int) ((MAX_SCORE - node.getY()) * yScale + BORDER_GAP);
 			graphPoints.add(new Point(x1, y1));
@@ -171,21 +166,7 @@ public class LinearTransformationPanel extends JPanel {
 			int ovalH = GRAPH_POINT_WIDTH;
 			g2.fillOval(x, y, ovalW, ovalH);
 		}
-		info.removeAll();
-		info.setLayout(new GridLayout(nodes.size()-1, 1));
-		for(FunctionSegment segment : returnSegments()) {
-			System.out.println(segment);
-			JPanel aux = new JPanel(new GridLayout(1,2));
-			JLabel lb1 = new JLabel(segment.stringFunction());
-			JLabel lb2 = new JLabel(segment.stringPoints());
-			lb1.setHorizontalAlignment(SwingConstants.CENTER);
-			lb2.setHorizontalAlignment(SwingConstants.CENTER);
-			aux.add(lb1);
-			aux.add(lb2);
-			info.add(aux);
-			info.repaint();
-		}
-		((JFrame) SwingUtilities.getWindowAncestor(this)).pack();
+		
 	}
 
 	@Override
@@ -235,14 +216,15 @@ public class LinearTransformationPanel extends JPanel {
 
 	public void addNode(int x, int y) {
 		nodes.add(new Node(x, y));
-		Collections.sort(nodes);
+		nodes.sort();
 	}
 
 	public void moveNode(Node node, int x, int y) {
 		if(!node.isMoveable() ||x >= MAX_SCORE || y >= MAX_SCORE || x < 0 || y < 0)
 			return;
 		node.setCoordinates(x, y);
-		Collections.sort(nodes);
+		nodes.sort();
+		nodes.manualNotify();
 	}
 	
 	public void deleteNode(Node node) {
@@ -250,7 +232,7 @@ public class LinearTransformationPanel extends JPanel {
 	}
 
 	private Node getNode(int x, int y) {
-		for (Node node : nodes) {
+		for (Node node : nodes.getList()) {
 			double dist = Math.hypot((node.getX() - x), (node.getY() - y));
 			if (dist <= GRAPH_POINT_WIDTH / 2)
 				return node;
@@ -258,97 +240,8 @@ public class LinearTransformationPanel extends JPanel {
 		return null;
 	}
 	
-	public List<FunctionSegment> returnSegments() {
-		List<FunctionSegment> list = new ArrayList<FunctionSegment>();
-		//System.out.println(nodes);
-		for(int i = 1; i < nodes.size(); i++) {
-			Node node1 = nodes.get(i-1);
-			Node node2 = nodes.get(i);
-			//System.out.println("Node1 = " + node1);
-			//System.out.println("Node2 = " + node2);
-			list.add(new FunctionSegment(node1.getCoordinates(), node2.getCoordinates()));
-		}
-		//System.out.println("FIN");
-		return list;
-	}
-	
-	public List<Node> getNodes() { 
+	public NodeList getNodes() { 
 		return this.nodes;
-	}
-
-	private class Node implements Comparable<Object> {
-		private int x, y;
-		private boolean isSelected, isMoveable, isDeleteable;
-
-		public Node(int x, int y, boolean selected, boolean moveable, boolean deleteable) {
-			setCoordinates(x, y);
-			setSelected(selected);
-			setMoveable(moveable);
-			setDeleteable(deleteable);
-		}
-
-		public Node(int x, int y) {
-			this(x, y, true, true, true);
-		}
-
-		public int getX() {
-			return x;
-		}
-
-		public void setX(int x) {
-			this.x = x;
-		}
-
-		public int getY() {
-			return y;
-		}
-
-		public void setY(int y) {
-			this.y = y;
-		}
-
-		public boolean isSelected() {
-			return isSelected;
-		}
-
-		public void setSelected(boolean isSelected) {
-			this.isSelected = isSelected;
-		}
-
-		public boolean isMoveable() {
-			return isMoveable;
-		}
-
-		public void setMoveable(boolean isMoveable) {
-			this.isMoveable = isMoveable;
-		}
-
-		public boolean isDeleteable() {
-			return isDeleteable;
-		}
-
-		public void setDeleteable(boolean isDeleteable) {
-			this.isDeleteable = isDeleteable;
-		}
-
-		public void setCoordinates(int x, int y) {
-			setX(x);
-			setY(y);
-		}
-		
-		public Point getCoordinates() {
-			return new Point(getX(), getY());
-		}
-		
-		public String toString() {
-			return "Node (" + this.hashCode() + ") = (" + getX() + ", " + getY() + ")";
-		}
-
-		@Override
-		public int compareTo(Object arg0) {
-			return getX();
-		}
-
 	}
 
 }

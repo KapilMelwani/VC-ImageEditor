@@ -35,13 +35,13 @@ import javax.swing.filechooser.FileSystemView;
 
 import utils.ImageUtils;
 
-public class ImageFrame extends JFrame {
+public class ImageFrame extends Frame {
 
 	private JLabel lbInfo;
+	private MousePixelListener mousePixelListener;
 
 	// OTHERS
 	private BufferedImage image;
-	private ImageFrame parent;
 	private Dimension imageScaledDim;
 	private ImagePanel panel;
 	private String path;
@@ -52,15 +52,18 @@ public class ImageFrame extends JFrame {
 		setTitle(getFileName());
 	}
 
-	public ImageFrame(BufferedImage image, ImageFrame parent) {
+	public ImageFrame(BufferedImage image, Frame parent) {
+		super(parent);
 		setImage(image);
 		setParent(parent);
 		setPanel(new ImagePanel(image));
 		setLbInfo(new JLabel());
 		refreshImageInfo();
 		setImageScaledDim(ImageUtils.scaleImage(getImageDimension()));
-		if (parent != null)
-			setPath(parent.path);
+		if (parent != null) {
+			setPath(((ImageFrame)parent).path);
+			//setMousePixelListener(((ImageFrame)parent).getMousePixelListener());
+		}
 
 		add(getPanel(), BorderLayout.CENTER);
 		getPanel().setPreferredSize(getImageScaledDim());
@@ -86,14 +89,6 @@ public class ImageFrame extends JFrame {
 		this.panel = panel;
 	}
 
-	public ImageFrame getParent() {
-		return parent;
-	}
-
-	public void setParent(ImageFrame parent) {
-		this.parent = parent;
-	}
-
 	public Dimension getImageScaledDim() {
 		return imageScaledDim;
 	}
@@ -116,6 +111,20 @@ public class ImageFrame extends JFrame {
 
 	public void setLbInfo(JLabel lbInfo) {
 		this.lbInfo = lbInfo;
+	}
+
+	/**
+	 * @return the mousePixelListener
+	 */
+	public MousePixelListener getMousePixelListener() {
+		return mousePixelListener;
+	}
+
+	/**
+	 * @param mousePixelListener the mousePixelListener to set
+	 */
+	public void setMousePixelListener(MousePixelListener mousePixelListener) {
+		this.mousePixelListener = mousePixelListener;
 	}
 
 	public Dimension getImageDimension() {
@@ -147,6 +156,11 @@ public class ImageFrame extends JFrame {
 		final String[] units = new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
 		int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
 		return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+	
+	public void addMousePixelListener(MousePixelListener listener) {
+		setMousePixelListener(listener);
+		panel.addMouseMotionListener(listener);
 	}
 
 	public class ImagePanel extends JPanel {
