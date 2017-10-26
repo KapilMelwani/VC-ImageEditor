@@ -71,6 +71,7 @@ public class ImageFrame extends Frame {
 		setResizable(false);
 		pack();
 		System.out.println(getFileSize());
+		System.out.println(ImageUtils.brightness(image));
 	}
 
 	public BufferedImage getImage() {

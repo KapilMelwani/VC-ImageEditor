@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,10 @@ import main.MousePixelListener;
 import panels.PixelColorPanel;
 
 public class ImageUtils {
+
+	public static final double NTSC_RED = 0.299;
+	public static final double NTSC_GREEN = 0.587;
+	public static final double NTSC_BLUE = 0.114;
 
 	public static BufferedImage readImage(String file) {
 		BufferedImage aux = null;
@@ -70,10 +76,8 @@ public class ImageUtils {
 	}
 
 	/**
-	 * [0] = RED
-	 * [1] = GREEN
-	 * [2] = BLUE
-	 * [3] = ALPHA
+	 * [0] = RED [1] = GREEN [2] = BLUE [3] = ALPHA
+	 * 
 	 * @param color
 	 * @return
 	 */
@@ -85,12 +89,12 @@ public class ImageUtils {
 		rgba[3] = (color >> 24) & 0xFF;
 		return rgba;
 	}
-	
-	public static int rgbToInt(int Red, int Green, int Blue){
-	    Red = (Red << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
-	    Green = (Green << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
-	    Blue = Blue & 0x000000FF; //Mask out anything not blue.
-	    return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
+
+	public static int rgbToInt(int Red, int Green, int Blue) {
+		Red = (Red << 16) & 0x00FF0000; // Shift red 16-bits and mask out other stuff
+		Green = (Green << 8) & 0x0000FF00; // Shift Green 8-bits and mask out other stuff
+		Blue = Blue & 0x000000FF; // Mask out anything not blue.
+		return 0xFF000000 | Red | Green | Blue; // 0xFF000000 for 100% Alpha. Bitwise OR everything together.
 	}
 
 	public static void rgbToGrayscale(BufferedImage image) {
@@ -133,8 +137,8 @@ public class ImageUtils {
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
 				int value = ImageUtils.intToRGB(image.getRGB(row, col))[0];
-				for(FunctionSegment segment : f) {
-					if(segment.getP1().getX() < value) {
+				for (FunctionSegment segment : f) {
+					if (segment.getP1().getX() < value) {
 						value = (int) segment.f(value);
 						break;
 					}
@@ -180,9 +184,9 @@ public class ImageUtils {
 		for (int i = 0; i < image.getWidth(); i++)
 			for (int j = 0; j < image.getHeight(); j++) {
 				Color color = new Color(image.getRGB(i, j));
-				int red = (int) (color.getRed() * 0.299);
-				int green = (int) (color.getGreen() * 0.587);
-				int blue = (int) (color.getBlue() * 0.114);
+				int red = (int) (color.getRed() * NTSC_RED);
+				int green = (int) (color.getGreen() * NTSC_GREEN);
+				int blue = (int) (color.getBlue() * NTSC_BLUE);
 				values[index++] = red + green + blue;
 			}
 		return values;
@@ -192,12 +196,16 @@ public class ImageUtils {
 		int[] values = new int[256];
 		int index = 0;
 		for (int i = 0; i < 256; i++) {
-			int red = (int) (image[0][i] * 0.299);
-			int green = (int) (image[1][i] * 0.587);
-			int blue = (int) (image[2][i] * 0.114);
+			int red = (int) (image[0][i] * NTSC_RED);
+			int green = (int) (image[1][i] * NTSC_GREEN);
+			int blue = (int) (image[2][i] * NTSC_BLUE);
 			values[index++] = red + green + blue;
 		}
 		return values;
+	}
+
+	public static boolean isGrayscale(BufferedImage image) {
+		return false;
 	}
 
 	public static boolean isGrayscale(int[][] data) {
@@ -224,6 +232,64 @@ public class ImageUtils {
 		return list;
 	}
 
+	public static Point getGrayRange(BufferedImage bi) {
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
+		BufferedImage grayscale = bi;
+		if (!(bi.getType() == BufferedImage.TYPE_BYTE_INDEXED))
+			grayscale = ImageUtils.rgbToGrayscaleCopyAuto(bi);
+
+		for (int i = 0; i < grayscale.getWidth(); i++)
+			for (int j = 0; j < grayscale.getHeight(); j++) {
+				Color color = new Color(grayscale.getRGB(i, j));
+				if (color.getRed() > max)
+					max = color.getRed();
+				if (color.getRed() < min)
+					min = color.getRed();
+			}
+		return new Point(min, max);
+	}
+
+	public static BufferedImage changeBrightness(BufferedImage original, float val) {
+		RescaleOp brighterOp = new RescaleOp(val, 0, null);
+		BufferedImage image = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+		Graphics g = image.getGraphics();
+		g.drawImage(original, 0, 0, null);
+		g.dispose();
+		return brighterOp.filter(image, null);
+	}
+	
+	public static BufferedImage changeContrastBrightness(BufferedImage image, int brightness, float contrast) {
+		RescaleOp rescale = new RescaleOp(contrast, brightness, null);
+        return rescale.filter(image, null);
+	}
+
+	public static double brightness(BufferedImage image) {
+		int sum = 0;
+		int total = image.getWidth() * image.getHeight();
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				sum += ImageUtils.brightness(image.getRGB(row, col));
+			}
+		}
+		return sum / total;
+	}
+
+	public static int brightness(Color c) {
+		int r = (int) (c.getRed() * c.getRed() * NTSC_RED);
+		int g = (int) (c.getGreen() * c.getGreen() * NTSC_GREEN);
+		int b = (int) (c.getBlue() * c.getBlue() * NTSC_BLUE);
+		return (int) Math.sqrt(r + g + b);
+	}
+
+	public static int brightness(int color) {
+		int[] c = ImageUtils.intToRGB(color);
+		int r = (int) (Math.pow(c[0], 2) * NTSC_RED);
+		int g = (int) (Math.pow(c[1], 2) * NTSC_GREEN);
+		int b = (int) (Math.pow(c[2], 2) * NTSC_BLUE);
+		return (int) Math.sqrt(r + g + b);
+	}
+
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
 			PixelColorPanel pnMousePixelColor) {
 		ImageFrame frame = new ImageFrame(image, parent);
@@ -231,10 +297,11 @@ public class ImageUtils {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
-	
-	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, MousePixelListener listener) {
+
+	public static void createNewImageFrame(BufferedImage image, ImageFrame parent) {
 		ImageFrame frame = new ImageFrame(image, parent);
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(listener.getLabel(), listener.getColorPanel()));
+		MousePixelListener aux = parent.getMousePixelListener();
+		frame.getPanel().addMouseMotionListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}

@@ -32,7 +32,7 @@ public class LinearTranformationFrame extends JFrame {
 		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BufferedImage image = ImageUtils.linearTransform(parent.getImage(), ImageUtils.returnSegments(panel.getNodes().getList()));
-				ImageUtils.createNewImageFrame(image, parent, parent.getMousePixelListener());
+				ImageUtils.createNewImageFrame(image, parent);
 				((JFrame) SwingUtilities.getRoot((Component) e.getSource())).dispose();
 			}
 		});
