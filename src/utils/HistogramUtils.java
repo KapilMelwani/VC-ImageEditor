@@ -1,13 +1,8 @@
 package utils;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import main.RGB;
-
-import static utils.ImageUtils.NTSC_RED;
-import static utils.ImageUtils.NTSC_GREEN;
-import static utils.ImageUtils.NTSC_BLUE;
 
 public class HistogramUtils {
 	

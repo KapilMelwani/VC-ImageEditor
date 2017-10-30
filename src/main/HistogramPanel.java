@@ -9,7 +9,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import utils.ColorUtils;
-import utils.HistogramUtils;
-import utils.ImageUtils;
-
+@SuppressWarnings("serial")
 public class HistogramPanel extends JPanel {
 
 	protected static final int MIN_BAR_WIDTH = 4;

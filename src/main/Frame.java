@@ -2,6 +2,7 @@ package main;
 
 import javax.swing.JFrame;
 
+@SuppressWarnings("serial")
 public class Frame extends JFrame {
 	
 	protected Frame parent;

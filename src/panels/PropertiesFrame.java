@@ -2,6 +2,7 @@ package panels;
 
 import main.Frame;
 
+@SuppressWarnings("serial")
 public class PropertiesFrame extends Frame {
 
 	public PropertiesFrame(Frame parent) {

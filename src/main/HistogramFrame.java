@@ -3,8 +3,6 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -12,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
+@SuppressWarnings("serial")
 public class HistogramFrame extends Frame {
 
 	private HistogramPanel panel1, panel2, panel3;
@@ -37,7 +36,7 @@ public class HistogramFrame extends Frame {
 		}
 
 		getPanel1().newHistogramLayer(lut.grayCount(), Color.DARK_GRAY, true, "Gray");
-		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.DARK_GRAY, true, "Cumulative");
+		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.MAGENTA, true, "Cumulative");
 		getPanel3().newHistogramLayer(lut.weightedCount(), Color.DARK_GRAY, true, "Weighted");
 
 		getTabbedPane().addTab("Color", getPanel1());

@@ -1,19 +1,15 @@
 package main;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-import main.ImageFrame.ImagePanel;
-import panels.LinearTransformationPanel;
 import panels.PixelColorPanel;
 import utils.ImageUtils;
 
@@ -26,10 +22,6 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,8 +35,8 @@ import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
 
+@SuppressWarnings("serial")
 public class MainFrame extends JFrame {
 	
 	// JMENU
@@ -59,7 +51,7 @@ public class MainFrame extends JFrame {
 
 	private ImageFrame focusedFrame;
 	private JMenu mnEdit, mntmColor;
-	private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
+	//private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
 
 	/**
 	 * Launch the application.

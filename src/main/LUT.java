@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import utils.HistogramUtils;
 
@@ -86,13 +87,20 @@ public class LUT {
 	}
 
 	public int[] cumulativeCount() {
-		// TODO
-		return grayCount();
+		int[] aux = grayCount();
+		for(int i = 1; i < aux.length; i++)
+			aux[i] = aux[i] + aux[i-1];
+		return aux;
 	}
 
 	public int[] weightedCount() {
-		// TODO
-		return grayCount();
+		int[] aux = grayCount();
+		int total = Arrays.stream(aux).sum();
+		for(int i = 0; i < aux.length; i++) {
+			System.out.println(aux[i]);
+			aux[i] = (aux[i] / total) * 100;
+		}
+		return aux;
 	}
 
 }

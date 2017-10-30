@@ -2,7 +2,7 @@ package main;
 
 import java.awt.Point;
 
-public	 class Node implements Comparable<Object> {
+public	 class Node implements Comparable<Node> {
 	private int x, y;
 	private boolean isSelected, isMoveable, isDeleteable;
 
@@ -71,8 +71,8 @@ public	 class Node implements Comparable<Object> {
 	}
 
 	@Override
-	public int compareTo(Object arg0) {
-		return this.getX() - ((Node)arg0).getX();
+	public int compareTo(Node arg0) {
+		return this.getX() - arg0.getX();
 	}
 
 }

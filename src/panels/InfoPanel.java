@@ -1,17 +1,13 @@
 package panels;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,9 +17,9 @@ import javax.swing.border.LineBorder;
 
 import main.FunctionSegment;
 import main.Node;
-import main.NodeList;
 import utils.ImageUtils;
 
+@SuppressWarnings("serial")
 public class InfoPanel extends JPanel implements Observer {
 
 	private List<FunctionSegment> segments;
@@ -36,6 +32,7 @@ public class InfoPanel extends JPanel implements Observer {
 	protected void paintComponent(Graphics g) {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void update(Observable o, Object arg) {
 		if (!(arg instanceof List<?>))

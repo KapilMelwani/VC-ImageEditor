@@ -1,6 +1,5 @@
 package utils;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,19 +16,14 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 
-import main.Frame;
 import main.FunctionSegment;
 import main.HistogramFrame;
-import main.HistogramPanel;
 import main.ImageFrame;
 import main.LinearAdjustmentFrame;
 import main.LinearTranformationFrame;
 import main.Node;
-import main.NodeList;
 import main.MousePixelListener;
 import panels.PixelColorPanel;
 

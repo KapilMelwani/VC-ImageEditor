@@ -2,7 +2,6 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -16,6 +15,7 @@ import panels.InfoPanel;
 import panels.LinearTransformationPanel;
 import utils.ImageUtils;
 
+@SuppressWarnings("serial")
 public class LinearTranformationFrame extends JFrame {
 	
 	private ImageFrame parent;

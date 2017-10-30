@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import utils.ImageUtils;
 
+@SuppressWarnings("serial")
 public class LinearAdjustmentFrame extends Frame {
 
 	public final static int MIN_BRIGHTNESS = -255;
