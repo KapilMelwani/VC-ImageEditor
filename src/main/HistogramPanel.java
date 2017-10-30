@@ -18,40 +18,23 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import utils.ColorUtils;
 import utils.HistogramUtils;
 import utils.ImageUtils;
 
 public class HistogramPanel extends JPanel {
 
 	protected static final int MIN_BAR_WIDTH = 4;
-	private JPopupMenu popup;
-
-	private List<HistogramLayer> layers;
-	private ImageFrame parent;
 	
-	private RGB[][] lut;
+	private JPopupMenu popup;
+	private List<HistogramLayer> layers;
 
-	public HistogramPanel(BufferedImage image) {
-		lut = HistogramUtils.getLUT(image);
-		
-		int[][] rgbValues = null;
-		if(ImageUtils.isRGB(image))
-			rgbValues = HistogramUtils.rgbValueCount(image);
-		layers = new ArrayList<HistogramLayer>();
-
+	public HistogramPanel() {
 		int width = (256 * MIN_BAR_WIDTH) + 11;
 		setMinimumSize(new Dimension(width, 128));
 		setPreferredSize(new Dimension(width, 256));
-
 		popup = new JPopupMenu("Edit");
-		if (image.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-			newHistogramLayer(rgbValues[0], Color.RED, false, "Red");
-			newHistogramLayer(rgbValues[1], Color.GREEN, false, "Green");
-			newHistogramLayer(rgbValues[2], Color.BLUE, false, "Blue");
-			newHistogramLayer(ImageUtils.getGrayValues(rgbValues), Color.DARK_GRAY, true, "Histogram");
-		}
-		else
-			newHistogramLayer(rgbValues[0], Color.DARK_GRAY, true, "Histogram");
+		layers = new ArrayList<HistogramLayer>();
 		
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -82,7 +65,7 @@ public class HistogramPanel extends JPanel {
 		g2d.drawRect(xOffset, yOffset, width, height);
 	}
 
-	private void newHistogramLayer(int[] values, Color color, boolean visible, String text) {
+	public void newHistogramLayer(int[] values, Color color, boolean visible, String text) {
 		HistogramLayer newLayer = new HistogramLayer(values, color, visible);
 		JCheckBoxMenuItem newCheckBoxMenuItem = new JCheckBoxMenuItem(text, visible);
 		newCheckBoxMenuItem.addItemListener(new ItemListener() {
@@ -123,14 +106,6 @@ public class HistogramPanel extends JPanel {
 			}
 			g2d.dispose();
 		}
-	}
-
-	public ImageFrame getParentFrame() {
-		return parent;
-	}
-
-	public void setParent(ImageFrame parent) {
-		this.parent = parent;
 	}
 
 	public List<HistogramLayer> getLayers() {

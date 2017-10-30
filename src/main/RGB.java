@@ -30,6 +30,12 @@ public class RGB {
 	public int gray() {
 		return (int) (getRed() * NTSC_RED + getGreen() * NTSC_GREEN + getBlue() * NTSC_BLUE);
 	}
+	
+	public boolean isGrayscale() {
+		if(getRed() == getGreen() && getGreen() == getBlue())
+			return true;
+		return false;
+	}
 
 	/**
 	 * @return the red

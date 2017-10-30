@@ -174,7 +174,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchHistogramFrame(focusedFrame.getImage());
+				ImageUtils.launchHistogramFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmHistogram);

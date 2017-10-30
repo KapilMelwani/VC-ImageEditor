@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 
 import main.Frame;
 import main.FunctionSegment;
+import main.HistogramFrame;
 import main.HistogramPanel;
 import main.ImageFrame;
 import main.LinearAdjustmentFrame;
@@ -176,29 +177,7 @@ public class ImageUtils {
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-/*
-	public static int[][] getRGBValues(BufferedImage image) {
-		int width = image.getWidth();
-		int height = image.getHeight();
-		int[][] data = new int[3][256];
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 256; j++) {
-				data[i][j] = 0;
-			}
-		}
-
-		for (int c = 0; c < width; c++) {
-			for (int r = 0; r < height; r++) {
-				Color color = new Color(image.getRGB(c, r));
-				data[0][color.getRed()]++;
-				data[1][color.getGreen()]++;
-				data[2][color.getBlue()]++;
-			}
-		}
-		return data;
-	}
-*/
 	public static int[] getGrayValues(BufferedImage image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -212,19 +191,7 @@ public class ImageUtils {
 			}
 		return values;
 	}
-/*
-	public static int[] getGrayValues(int[][] image) {
-		int[] values = new int[256];
-		int index = 0;
-		for (int i = 0; i < 256; i++) {
-			int red = (int) (image[0][i] * NTSC_RED);
-			int green = (int) (image[1][i] * NTSC_GREEN);
-			int blue = (int) (image[2][i] * NTSC_BLUE);
-			values[index++] = red + green + blue;
-		}
-		return values;
-	}
-*/
+
 	public static boolean isGrayscale(BufferedImage image) {
 		return false;
 	}
@@ -322,28 +289,7 @@ public class ImageUtils {
 		return Math.sqrt(standardDeviation/aux.length);
 	}
 	
-	public static boolean isRGB(BufferedImage image) {
-		int i = image.getType();
-		if(i == BufferedImage.TYPE_3BYTE_BGR)
-			return true;
-		else if(i == BufferedImage.TYPE_4BYTE_ABGR)
-			return true;
-		else if(i == BufferedImage.TYPE_4BYTE_ABGR_PRE)
-			return true;
-		else if(i == BufferedImage.TYPE_INT_ARGB)
-			return true;
-		else if(i == BufferedImage.TYPE_INT_ARGB_PRE)
-			return true;
-		else if(i == BufferedImage.TYPE_INT_BGR)
-			return true;
-		else if(i == BufferedImage.TYPE_INT_RGB)
-			return true;
-		else if(i == BufferedImage.TYPE_USHORT_555_RGB)
-			return true;
-		else if(i == BufferedImage.TYPE_USHORT_565_RGB)
-			return true;
-		return false;
-	}
+	
 
 	public static double brightness(BufferedImage image) {
 		int sum = 0;
@@ -427,22 +373,13 @@ public class ImageUtils {
 		frame.setVisible(true);
 	}
 
-	public static void launchHistogramFrame(BufferedImage image) {
-		JFrame frame = new JFrame("Histogram");
-		frame.setLayout(new BorderLayout());
-		frame.add(new JScrollPane(new HistogramPanel(image)));
-		frame.pack();
-		frame.setLocationRelativeTo(null);
+	public static void launchHistogramFrame(ImageFrame parent) {
+		HistogramFrame frame = new HistogramFrame(parent);
 		frame.setVisible(true);
 	}
 
 	public static void launchLinearTransFrame(BufferedImage image, ImageFrame parent) {
 		LinearTranformationFrame frame = new LinearTranformationFrame(parent);
-		frame.setVisible(true);
-	}
-	
-	public static void launchLinearAdjustFrame(BufferedImage image, Frame parent) {
-		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent, (int)ImageUtils.brightness(image), 0);
 		frame.setVisible(true);
 	}
 
