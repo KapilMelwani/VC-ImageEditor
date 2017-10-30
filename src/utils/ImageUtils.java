@@ -175,7 +175,7 @@ public class ImageUtils {
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-
+/*
 	public static int[][] getRGBValues(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -197,7 +197,7 @@ public class ImageUtils {
 		}
 		return data;
 	}
-
+*/
 	public static int[] getGrayValues(BufferedImage image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -211,7 +211,7 @@ public class ImageUtils {
 			}
 		return values;
 	}
-
+/*
 	public static int[] getGrayValues(int[][] image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -223,7 +223,7 @@ public class ImageUtils {
 		}
 		return values;
 	}
-
+*/
 	public static boolean isGrayscale(BufferedImage image) {
 		return false;
 	}
@@ -319,6 +319,29 @@ public class ImageUtils {
             standardDeviation += Math.pow(num - mean, 2);
         }
 		return Math.sqrt(standardDeviation/aux.length);
+	}
+	
+	public static boolean isRGB(BufferedImage image) {
+		int i = image.getType();
+		if(i == BufferedImage.TYPE_3BYTE_BGR)
+			return true;
+		else if(i == BufferedImage.TYPE_4BYTE_ABGR)
+			return true;
+		else if(i == BufferedImage.TYPE_4BYTE_ABGR_PRE)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_ARGB)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_ARGB_PRE)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_BGR)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_RGB)
+			return true;
+		else if(i == BufferedImage.TYPE_USHORT_555_RGB)
+			return true;
+		else if(i == BufferedImage.TYPE_USHORT_565_RGB)
+			return true;
+		return false;
 	}
 
 	public static double brightness(BufferedImage image) {

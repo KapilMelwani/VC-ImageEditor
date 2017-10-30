@@ -34,7 +34,7 @@ public class LinearAdjustmentFrame extends Frame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
-		image = ImageUtils.deepCopy(((ImageFrame) parent).getImage());
+		image = ImageUtils.copyImage(((ImageFrame) parent).getImage());
 
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 

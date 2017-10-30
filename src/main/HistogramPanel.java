@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import utils.HistogramUtils;
 import utils.ImageUtils;
 
 public class HistogramPanel extends JPanel {
@@ -27,9 +28,15 @@ public class HistogramPanel extends JPanel {
 
 	private List<HistogramLayer> layers;
 	private ImageFrame parent;
+	
+	private RGB[][] lut;
 
 	public HistogramPanel(BufferedImage image) {
-		int[][] rgbValues = ImageUtils.getRGBValues(image);
+		lut = HistogramUtils.getLUT(image);
+		
+		int[][] rgbValues = null;
+		if(ImageUtils.isRGB(image))
+			rgbValues = HistogramUtils.rgbValueCount(image);
 		layers = new ArrayList<HistogramLayer>();
 
 		int width = (256 * MIN_BAR_WIDTH) + 11;
@@ -38,10 +45,10 @@ public class HistogramPanel extends JPanel {
 
 		popup = new JPopupMenu("Edit");
 		if (image.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-			newHistogramLayer(rgbValues[0], Color.RED, true, "Red");
-			newHistogramLayer(rgbValues[1], Color.GREEN, true, "Green");
-			newHistogramLayer(rgbValues[2], Color.BLUE, true, "Blue");
-			newHistogramLayer(ImageUtils.getGrayValues(rgbValues), Color.DARK_GRAY, false, "Histogram");
+			newHistogramLayer(rgbValues[0], Color.RED, false, "Red");
+			newHistogramLayer(rgbValues[1], Color.GREEN, false, "Green");
+			newHistogramLayer(rgbValues[2], Color.BLUE, false, "Blue");
+			newHistogramLayer(ImageUtils.getGrayValues(rgbValues), Color.DARK_GRAY, true, "Histogram");
 		}
 		else
 			newHistogramLayer(rgbValues[0], Color.DARK_GRAY, true, "Histogram");
