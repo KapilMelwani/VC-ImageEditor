@@ -70,8 +70,6 @@ public class ImageFrame extends Frame {
 		add(getLbInfo(), BorderLayout.NORTH);
 		setResizable(false);
 		pack();
-		System.out.println(getFileSize());
-		System.out.println(ImageUtils.brightness(image));
 	}
 
 	public BufferedImage getImage() {
@@ -80,6 +78,10 @@ public class ImageFrame extends Frame {
 
 	public void setImage(BufferedImage image) {
 		this.image = image;
+		if(getPanel() != null) {
+			getPanel().setImage(getImage());
+			getPanel().repaint();
+		}
 	}
 
 	public ImagePanel getPanel() {

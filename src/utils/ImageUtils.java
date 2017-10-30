@@ -78,25 +78,36 @@ public class ImageUtils {
 	}
 
 	/**
-	 * [0] = RED [1] = GREEN [2] = BLUE [3] = ALPHA
+	 * [0] = RED [1] = GREEN [2] = BLUE
 	 * 
 	 * @param color
 	 * @return
 	 */
 	public static int[] intToRGB(int color) {
-		int[] rgba = new int[4];
-		rgba[0] = (color) & 0xFF;
-		rgba[1] = (color >> 8) & 0xFF;
-		rgba[2] = (color >> 16) & 0xFF;
-		rgba[3] = (color >> 24) & 0xFF;
+		Color aux = new Color(color);
+		int[] rgba = new int[3];
+		rgba[0] = aux.getRed();
+		rgba[1] = aux.getGreen();
+		rgba[2] = aux.getBlue();
 		return rgba;
 	}
+	
+	/**
+	 * [0] = RED [1] = GREEN [2] = BLUE [3] = ALPHA
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static int[] grayToRGB(int gray) {
+		int[] rgb = new int[3];
+		rgb[0] = (int) (gray / NTSC_RED);
+		rgb[1] = (int) (gray / NTSC_GREEN);
+		rgb[2] = (int) (gray / NTSC_BLUE);
+		return rgb;
+	}
 
-	public static int rgbToInt(int Red, int Green, int Blue) {
-		Red = (Red << 16) & 0x00FF0000; // Shift red 16-bits and mask out other stuff
-		Green = (Green << 8) & 0x0000FF00; // Shift Green 8-bits and mask out other stuff
-		Blue = Blue & 0x000000FF; // Mask out anything not blue.
-		return 0xFF000000 | Red | Green | Blue; // 0xFF000000 for 100% Alpha. Bitwise OR everything together.
+	public static int rgbToInt(int red, int green, int blue) {
+		return new Color(red, green, blue).getRGB();
 	}
 
 	public static void rgbToGrayscale(BufferedImage image) {
@@ -110,7 +121,7 @@ public class ImageUtils {
 				image.setRGB(i, j, newColor.getRGB());
 			}
 	}
-
+	
 	public static BufferedImage rgbToGrayscaleCopy(BufferedImage original) {
 		BufferedImage image = deepCopy(original);
 		for (int i = 0; i < image.getWidth(); i++)
@@ -122,6 +133,14 @@ public class ImageUtils {
 				Color newColor = new Color(red + green + blue, red + green + blue, red + green + blue);
 				image.setRGB(i, j, newColor.getRGB());
 			}
+		return image;
+	}
+	
+	public static BufferedImage copyImage(BufferedImage original) {
+		BufferedImage image = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+		Graphics g = image.getGraphics();
+		g.drawImage(original, 0, 0, null);
+		g.dispose();
 		return image;
 	}
 
@@ -157,7 +176,7 @@ public class ImageUtils {
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-
+/*
 	public static int[][] getRGBValues(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -179,7 +198,7 @@ public class ImageUtils {
 		}
 		return data;
 	}
-
+*/
 	public static int[] getGrayValues(BufferedImage image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -193,7 +212,7 @@ public class ImageUtils {
 			}
 		return values;
 	}
-
+/*
 	public static int[] getGrayValues(int[][] image) {
 		int[] values = new int[256];
 		int index = 0;
@@ -205,7 +224,7 @@ public class ImageUtils {
 		}
 		return values;
 	}
-
+*/
 	public static boolean isGrayscale(BufferedImage image) {
 		return false;
 	}
@@ -260,10 +279,70 @@ public class ImageUtils {
 		g.dispose();
 		return brighterOp.filter(image, null);
 	}
-	
+
 	public static BufferedImage changeContrastBrightness(BufferedImage image, int brightness, float contrast) {
 		RescaleOp rescale = new RescaleOp(contrast, brightness, null);
-        return rescale.filter(image, null);
+		return rescale.filter(image, null);
+	}
+	
+	public static double maxContrast(BufferedImage image) {
+		int[] aux = new int[image.getWidth()*image.getHeight()];
+		int k = 0;
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++)
+				aux[k++] = ImageUtils.brightness(image.getRGB(row, col));
+		int sum = 0;
+        for(int num : aux)
+            sum += num;
+        double mean = sum/aux.length;
+		return ImageUtils.contrast(image) + mean;
+	}
+
+	public static double contrast(BufferedImage image) {
+
+		int[] aux = new int[image.getWidth()*image.getHeight()];
+		int k = 0;
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				aux[k++] = ImageUtils.brightness(image.getRGB(row, col));
+			}
+		}
+		
+		double sum = 0.0, standardDeviation = 0.0;
+
+        for(int num : aux) {
+            sum += num;
+        }
+
+        double mean = sum/aux.length;
+
+        for(int num: aux) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+		return Math.sqrt(standardDeviation/aux.length);
+	}
+	
+	public static boolean isRGB(BufferedImage image) {
+		int i = image.getType();
+		if(i == BufferedImage.TYPE_3BYTE_BGR)
+			return true;
+		else if(i == BufferedImage.TYPE_4BYTE_ABGR)
+			return true;
+		else if(i == BufferedImage.TYPE_4BYTE_ABGR_PRE)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_ARGB)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_ARGB_PRE)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_BGR)
+			return true;
+		else if(i == BufferedImage.TYPE_INT_RGB)
+			return true;
+		else if(i == BufferedImage.TYPE_USHORT_555_RGB)
+			return true;
+		else if(i == BufferedImage.TYPE_USHORT_565_RGB)
+			return true;
+		return false;
 	}
 
 	public static double brightness(BufferedImage image) {
@@ -290,6 +369,39 @@ public class ImageUtils {
 		int g = (int) (Math.pow(c[1], 2) * NTSC_GREEN);
 		int b = (int) (Math.pow(c[2], 2) * NTSC_BLUE);
 		return (int) Math.sqrt(r + g + b);
+	}
+	
+	public static int brighten(int color, int offset) {
+		int[] rgb = ImageUtils.intToRGB(color);
+		rgb[0] = truncate(rgb[0] + offset);
+		rgb[1] = truncate(rgb[1] + offset);
+		rgb[2] = truncate(rgb[2] + offset);
+		return ImageUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
+	}
+
+	public static int contrast(int color, float contrast) {
+		float factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+		int[] rgb = ImageUtils.intToRGB(color);
+		rgb[0] = (int) truncate(factor * (rgb[0] - 128) + 128);
+		rgb[1] = (int) truncate(factor * (rgb[1] - 128) + 128);
+		rgb[2] = (int) truncate(factor * (rgb[2] - 128) + 128);
+		return ImageUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
+	}
+
+	public static int truncate(int value) {
+		if (value < 0)
+			value = 0;
+		else if (value > 255)
+			value = 255;
+		return value;
+	}
+	
+	public static float truncate(float value) {
+		if (value < 0)
+			value = 0;
+		else if (value > 255)
+			value = 255;
+		return value;
 	}
 
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
@@ -331,6 +443,11 @@ public class ImageUtils {
 	
 	public static void launchLinearAdjustFrame(BufferedImage image, Frame parent) {
 		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent, (int)ImageUtils.brightness(image), 0);
+		frame.setVisible(true);
+	}
+
+	public static void launchLinearAdjustFrame(BufferedImage image, ImageFrame parent) {
+		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent);
 		frame.setVisible(true);
 	}
 

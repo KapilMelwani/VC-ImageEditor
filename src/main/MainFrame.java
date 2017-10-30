@@ -211,6 +211,12 @@ public class MainFrame extends JFrame {
 		pnInfo.add(lbCursorInfo);
 
 		JButton btnImage = new JButton("Image");
+		btnImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createNewImageFrame("/Users/peter/Drive/VC/lena.png");
+			}
+		});
+		
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		pnMousePixelColor = new PixelColorPanel();
 		aux.add(pnMousePixelColor);
