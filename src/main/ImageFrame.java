@@ -80,6 +80,10 @@ public class ImageFrame extends Frame {
 
 	public void setImage(BufferedImage image) {
 		this.image = image;
+		if(getPanel() != null) {
+			getPanel().setImage(getImage());
+			getPanel().repaint();
+		}
 	}
 
 	public ImagePanel getPanel() {

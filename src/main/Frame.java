@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 public class Frame extends JFrame {
 	
-	private Frame parent;
+	protected Frame parent;
 	
 	public Frame(Frame parent) {
 		setParent(parent);

@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -189,6 +189,16 @@ public class MainFrame extends JFrame {
 		});	    
 		mnEdit.add(mntmLinearTrans);
 		
+		mntmLinearAdjust = new JMenuItem("Linear Adjustment");
+		mntmLinearAdjust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				ImageUtils.launchLinearAdjustFrame(focusedFrame.getImage(), focusedFrame);
+			}
+		});	    
+		mnEdit.add(mntmLinearAdjust);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -201,6 +211,12 @@ public class MainFrame extends JFrame {
 		pnInfo.add(lbCursorInfo);
 
 		JButton btnImage = new JButton("Image");
+		btnImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createNewImageFrame("/Users/peter/Drive/VC/lena.png");
+			}
+		});
+		
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		pnMousePixelColor = new PixelColorPanel();
 		aux.add(pnMousePixelColor);
