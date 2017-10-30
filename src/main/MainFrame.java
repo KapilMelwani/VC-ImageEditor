@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -188,6 +188,16 @@ public class MainFrame extends JFrame {
 			}
 		});	    
 		mnEdit.add(mntmLinearTrans);
+		
+		mntmLinearAdjust = new JMenuItem("Linear Adjustment");
+		mntmLinearAdjust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				ImageUtils.launchLinearAdjustFrame(focusedFrame.getImage(), focusedFrame);
+			}
+		});	    
+		mnEdit.add(mntmLinearAdjust);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

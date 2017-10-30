@@ -21,9 +21,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import main.Frame;
 import main.FunctionSegment;
 import main.HistogramPanel;
 import main.ImageFrame;
+import main.LinearAdjustmentFrame;
 import main.LinearTranformationFrame;
 import main.Node;
 import main.NodeList;
@@ -324,6 +326,11 @@ public class ImageUtils {
 
 	public static void launchLinearTransFrame(BufferedImage image, ImageFrame parent) {
 		LinearTranformationFrame frame = new LinearTranformationFrame(parent);
+		frame.setVisible(true);
+	}
+	
+	public static void launchLinearAdjustFrame(BufferedImage image, Frame parent) {
+		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent, (int)ImageUtils.brightness(image), 0);
 		frame.setVisible(true);
 	}
 
