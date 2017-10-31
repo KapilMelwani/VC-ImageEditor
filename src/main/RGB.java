@@ -33,10 +33,20 @@ public class RGB {
 	
 	public RGB gamma(double gamma) {
 		double gammaCorrection = 1 / gamma;
+		int r = (int) (255 * Math.pow((double)(getRed() / 255d), gammaCorrection));
+		int g = (int) (255 * Math.pow((double)(getGreen() / 255d), gammaCorrection));
+		int b = (int) (255 * Math.pow((double)(getBlue() / 255d), gammaCorrection));
+		return new RGB(r,g,b);
+	}
+	
+	public void gammaMod(double gamma) {
+		double gammaCorrection = 1 / gamma;
 		int r = (int) (255 * Math.pow(getRed() / 255, gammaCorrection));
 		int g = (int) (255 * Math.pow(getGreen() / 255, gammaCorrection));
 		int b = (int) (255 * Math.pow(getBlue() / 255, gammaCorrection));
-		return new RGB(r,g,b);
+		setRed(r);
+		setGreen(g);
+		setBlue(b);
 	}
 	
 	public boolean isGrayscale() {
@@ -89,6 +99,19 @@ public class RGB {
 	 */
 	public void setBlue(int blue) {
 		this.blue = blue;
+	}
+	
+	public static int toInt(int red, int green, int blue) {
+		int rgb = red;
+		rgb = rgb << 8;
+		rgb |= green;
+		rgb = rgb << 8;
+		rgb |= blue;
+		return rgb;
+	}
+	
+	public String toString() {
+		return "RGB@" + this.hashCode() + " : " + "[" + getRed() + ", " + getGreen() + ", " + getBlue() + "]";
 	}
 	
 }

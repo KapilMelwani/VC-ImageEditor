@@ -9,6 +9,7 @@ public class Frame extends JFrame {
 	
 	public Frame(Frame parent) {
 		setParent(parent);
+		setLocationRelativeTo(null);
 	}
 
 	/**

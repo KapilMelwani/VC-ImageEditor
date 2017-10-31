@@ -312,6 +312,15 @@ public class ImageUtils {
 		return (int) Math.sqrt(r + g + b);
 	}
 	
+	public static int gamma(int color, double gamma) {
+		int[] rgb = ImageUtils.intToRGB(color);
+		double gammaCorrection = 1 / gamma;
+		int r = (int) (255 * Math.pow((double)(rgb[0] / 255d), gammaCorrection));
+		int g = (int) (255 * Math.pow((double)(rgb[1] / 255d), gammaCorrection));
+		int b = (int) (255 * Math.pow((double)(rgb[2] / 255d), gammaCorrection));
+		return ImageUtils.rgbToInt(r, g, b);
+	}
+	
 	public static int brighten(int color, int offset) {
 		int[] rgb = ImageUtils.intToRGB(color);
 		rgb[0] = truncate(rgb[0] + offset);
@@ -364,7 +373,6 @@ public class ImageUtils {
 	public static void createNewImageFrame(ImageFrame parent, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
 		ImageFrame frame = new ImageFrame(parent.getImage(), parent);
 		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
-		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 

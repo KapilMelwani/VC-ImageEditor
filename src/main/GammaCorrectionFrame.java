@@ -22,7 +22,7 @@ import utils.ImageUtils;
 public class GammaCorrectionFrame extends Frame {
 	
 	public final static int MIN_GAMMA = 1;
-	public final static int MAX_GAMMA = 79;
+	public final static int MAX_GAMMA = 799;
 
 	private JSlider sliderGamma;
 	private JLabel lbFormula;
@@ -38,11 +38,11 @@ public class GammaCorrectionFrame extends Frame {
 
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
-		setSliderGamma(new JSlider(JSlider.HORIZONTAL, MIN_GAMMA, MAX_GAMMA, 10));
+		setSliderGamma(new JSlider(JSlider.HORIZONTAL, MIN_GAMMA, MAX_GAMMA, 100));
 		getSliderGamma().setBorder(BorderFactory.createTitledBorder("Gamma Correction"));
 		panel.add(getSliderGamma());
 		
-		setLbFormula(new JLabel("<html>I' = 255 x (<sup>I</sup>&frasl;<sub>255</sub>)<sup><sup>1</sup>&frasl;<sub>&gamma</sub></sup></html>", SwingConstants.CENTER));
+		setLbFormula(new JLabel("<html>I' = 255 x (<sup>I </sup>&frasl;<sub> 255</sub>)<sup><sup>1 </sup>&frasl;<sub> &gamma</sub></sup></html>", SwingConstants.CENTER));
 		getLbFormula().setBorder(BorderFactory.createTitledBorder(""));
 		panel.add(getLbFormula());
 		
@@ -52,13 +52,16 @@ public class GammaCorrectionFrame extends Frame {
 
 		getSliderGamma().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
-				gamma(getSliderGamma().getValue()/10);
+				double gamma = getSliderGamma().getValue()/100d;
+				gamma(gamma);
+				((ImageFrame) parent).getPanel().repaint();
 			}
 		});
 
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				((ImageFrame) parent).setImage(ImageUtils.deepCopy(image));
+				((ImageFrame) parent).getPanel().repaint();
 				getSliderGamma().setValue(100);
 			}
 		});
@@ -70,8 +73,7 @@ public class GammaCorrectionFrame extends Frame {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++) {
 				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
-				RGB color = new RGB(image.getRGB(row, col)).gamma(gamma);
-				aux.setRGB(row, col, color.toInt());
+				aux.setRGB(row, col, ImageUtils.gamma(image.getRGB(row, col), gamma));
 			}
 	}
 
