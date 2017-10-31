@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 
 import main.FunctionSegment;
+import main.GammaCorrectionFrame;
 import main.HistogramFrame;
 import main.ImageFrame;
 import main.LinearAdjustmentFrame;
@@ -377,8 +378,13 @@ public class ImageUtils {
 		frame.setVisible(true);
 	}
 
-	public static void launchLinearAdjustFrame(BufferedImage image, ImageFrame parent) {
+	public static void launchLinearAdjustFrame(ImageFrame parent) {
 		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent);
+		frame.setVisible(true);
+	}
+	
+	public static void launchGammaCorrectionFrame(ImageFrame parent) {
+		GammaCorrectionFrame frame = new GammaCorrectionFrame(parent);
 		frame.setVisible(true);
 	}
 

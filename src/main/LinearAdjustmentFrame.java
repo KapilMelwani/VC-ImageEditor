@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -32,7 +31,6 @@ public class LinearAdjustmentFrame extends Frame {
 	public LinearAdjustmentFrame(Frame parent) {
 		super(parent);
 		setTitle("Linear Adjustment: " + parent.getTitle());
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
 		image = ImageUtils.copyImage(((ImageFrame) parent).getImage());

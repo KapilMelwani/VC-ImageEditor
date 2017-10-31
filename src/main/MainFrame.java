@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -186,10 +186,20 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchLinearAdjustFrame(focusedFrame.getImage(), focusedFrame);
+				ImageUtils.launchLinearAdjustFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmLinearAdjust);
+		
+		mntmGammaCorrect = new JMenuItem("Gamma Correction");
+		mntmGammaCorrect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				ImageUtils.launchGammaCorrectionFrame(focusedFrame);
+			}
+		});	    
+		mnEdit.add(mntmGammaCorrect);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

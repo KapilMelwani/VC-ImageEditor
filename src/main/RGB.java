@@ -31,10 +31,22 @@ public class RGB {
 		return (int) (getRed() * NTSC_RED + getGreen() * NTSC_GREEN + getBlue() * NTSC_BLUE);
 	}
 	
+	public RGB gamma(double gamma) {
+		double gammaCorrection = 1 / gamma;
+		int r = (int) (255 * Math.pow(getRed() / 255, gammaCorrection));
+		int g = (int) (255 * Math.pow(getGreen() / 255, gammaCorrection));
+		int b = (int) (255 * Math.pow(getBlue() / 255, gammaCorrection));
+		return new RGB(r,g,b);
+	}
+	
 	public boolean isGrayscale() {
 		if(getRed() == getGreen() && getGreen() == getBlue())
 			return true;
 		return false;
+	}
+	
+	public int toInt() {
+		return new Color(getRed(), getGreen(), getBlue()).getRGB();
 	}
 
 	/**
@@ -78,5 +90,5 @@ public class RGB {
 	public void setBlue(int blue) {
 		this.blue = blue;
 	}
-
+	
 }

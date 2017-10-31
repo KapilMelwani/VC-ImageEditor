@@ -1,9 +1,6 @@
 package main;
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import utils.HistogramUtils;
 
