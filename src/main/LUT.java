@@ -14,6 +14,14 @@ public class LUT {
 		setLut(lut);
 		setGrayscale();
 	}
+	
+	public LUT(LUT lut) {
+		this(lut.getLut());
+	}
+	
+	public LUT() {
+		this((RGB[][])null);
+	}
 
 	public LUT(BufferedImage image) {
 		this(HistogramUtils.getLUT(image));
@@ -121,6 +129,25 @@ public class LUT {
 			if(i != 0.0 && i < min)
 				min = i;
 		return min;
+	}
+	
+	public int[][] specify(BufferedImage image) {
+		int[] norm = new LUT(HistogramUtils.getLUT(image)).normalizedCount();
+		int height = image.getHeight();
+		int width = image.getWidth();
+		int[][] aux = new int[height][width];
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++) {
+				if(isGrayscale()) {
+					double n = norm[lut[i][j].getRed()];
+					aux[i][j] = (int) (n * height * width);
+				}
+				else {
+					double n = norm[lut[i][j].gray()];
+					aux[i][j] = (int) (n * height * width);
+				}
+			}
+		return aux;
 	}
 
 }

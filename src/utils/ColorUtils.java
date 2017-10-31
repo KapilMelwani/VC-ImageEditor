@@ -10,7 +10,6 @@ public class ColorUtils {
 	public static final double NTSC_GREEN = 0.587;
 	public static final double NTSC_BLUE = 0.114;
 	
-	
 	public static boolean isRGB(BufferedImage image) {
 		int i = image.getType();
 		if(i == BufferedImage.TYPE_3BYTE_BGR)

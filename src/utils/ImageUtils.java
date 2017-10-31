@@ -16,7 +16,10 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 import main.FunctionSegment;
 import main.GammaCorrectionFrame;
@@ -42,6 +45,20 @@ public class ImageUtils {
 			e.printStackTrace();
 		}
 		return aux;
+	}
+	
+	public static File openImage() {
+		JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		jfc.setDialogTitle("Select an image");
+		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		jfc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "jpg", "tif");
+		jfc.addChoosableFileFilter(filter);
+		int returnValue = jfc.showOpenDialog(null);
+		File file = null;
+		if (returnValue == JFileChooser.APPROVE_OPTION)
+			file = jfc.getSelectedFile();
+		return file;
 	}
 
 	public static Dimension scaleImage(Dimension image) {

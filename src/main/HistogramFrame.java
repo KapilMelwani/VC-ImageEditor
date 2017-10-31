@@ -3,14 +3,22 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import utils.HistogramUtils;
+import utils.ImageUtils;
 
 @SuppressWarnings("serial")
 public class HistogramFrame extends Frame {
@@ -20,6 +28,7 @@ public class HistogramFrame extends Frame {
 	private LUT lut;
 
 	private JLabel lbColorValue, lbCount;
+	private JButton btnSpecify;
 
 	public HistogramFrame(Frame parent) {
 		super(parent);
@@ -54,11 +63,20 @@ public class HistogramFrame extends Frame {
 
 		setLbColorValue(new JLabel("0", SwingConstants.CENTER));
 		getLbColorValue().setBorder(BorderFactory.createTitledBorder("Color Value"));
-		// getLbColorValue().setHorizontalTextPosition(SwingConstants.CENTER);
 
 		setLbCount(new JLabel("0", SwingConstants.CENTER));
 		getLbCount().setBorder(BorderFactory.createTitledBorder("Ocurrences"));
-		// getLbCount().setHorizontalTextPosition(SwingConstants.CENTER);
+		
+		setBtnSpecify(new JButton("Specify Histogram"));
+		getBtnSpecify().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				File selectedFile = ImageUtils.openImage();
+				if(selectedFile == null)
+					return;
+				BufferedImage spec = ImageUtils.readImage(selectedFile.getAbsolutePath());
+				LUT lut = new LUT(spec);
+			}
+		});
 
 		getPanel1().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 		getPanel2().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
@@ -67,6 +85,7 @@ public class HistogramFrame extends Frame {
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		aux.add(lbColorValue);
 		aux.add(lbCount);
+		aux.add(btnSpecify);
 		add(aux, BorderLayout.SOUTH);
 
 		setLocationByPlatform(true);
@@ -128,6 +147,14 @@ public class HistogramFrame extends Frame {
 
 	public void setLbCount(JLabel lbCount) {
 		this.lbCount = lbCount;
+	}
+
+	public JButton getBtnSpecify() {
+		return btnSpecify;
+	}
+
+	public void setBtnSpecify(JButton btnSpecify) {
+		this.btnSpecify = btnSpecify;
 	}
 
 }

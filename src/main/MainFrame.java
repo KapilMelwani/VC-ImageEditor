@@ -87,18 +87,11 @@ public class MainFrame extends JFrame {
 		mntmOpen.setSelectedIcon(new ImageIcon(MainFrame.class.getResource("/com/sun/java/swing/plaf/windows/icons/File.gif")));
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-				jfc.setDialogTitle("Select an image");
-				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				jfc.setAcceptAllFileFilterUsed(false);
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "jpg");
-				jfc.addChoosableFileFilter(filter);
-				int returnValue = jfc.showOpenDialog(null);
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					System.out.println("Opening " + selectedFile.getAbsolutePath());
-					createNewImageFrame(selectedFile.getAbsolutePath());
-				}
+				File selectedFile = ImageUtils.openImage();
+				if(selectedFile == null)
+					return;
+				System.out.println("Opening " + selectedFile.getAbsolutePath());
+				createNewImageFrame(selectedFile.getAbsolutePath());
 
 			}
 		});

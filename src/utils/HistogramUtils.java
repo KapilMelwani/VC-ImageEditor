@@ -16,5 +16,18 @@ public class HistogramUtils {
 				lut[i][j] = new RGB(image.getRGB(i, j));
 		return lut;
 	}
+	
+	public static BufferedImage specifyHistogram(BufferedImage image, int[] normalized) {
+		int height = image.getHeight();
+		int width = image.getWidth();
+		if(ColorUtils.isGrayscale(image))
+			image = ImageUtils.rgbToGrayscaleCopyAuto(image);
+		for(int row = 0; row < height; row++)
+			for(int col = 0; col < width; col++) {
+				int gray = new RGB(image.getRGB(row, col)).gray();
+				image.setRGB(row, col, gray);
+			}
+		return image;	
+	}
 
 }
