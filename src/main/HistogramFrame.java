@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 @SuppressWarnings("serial")
 public class HistogramFrame extends Frame {
@@ -31,26 +33,32 @@ public class HistogramFrame extends Frame {
 
 		if (!lut.isGrayscale()) {
 			getPanel1().newHistogramLayer(lut.redCount(), Color.RED, false, "Red");
-			getPanel1().newHistogramLayer(lut.redCount(), Color.GREEN, false, "Green");
-			getPanel1().newHistogramLayer(lut.redCount(), Color.BLUE, false, "Blue");
+			getPanel1().newHistogramLayer(lut.greenCount(), Color.GREEN, false, "Green");
+			getPanel1().newHistogramLayer(lut.blueCount(), Color.BLUE, false, "Blue");
 		}
 
 		getPanel1().newHistogramLayer(lut.grayCount(), Color.DARK_GRAY, true, "Gray");
 		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.MAGENTA, true, "Cumulative");
-		getPanel3().newHistogramLayer(lut.weightedCount(), Color.DARK_GRAY, true, "Weighted");
+		getPanel3().newHistogramLayer(lut.normalizedCount(), Color.DARK_GRAY, true, "Weighted");
 
 		getTabbedPane().addTab("Color", getPanel1());
 		getTabbedPane().addTab("Cumulative", getPanel2());
 		getTabbedPane().addTab("Weighted", getPanel3());
+		getTabbedPane().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				System.out.println("Tab: " + tabbedPane.getSelectedIndex());
+				pack();
+			}
+		});
 		add(getTabbedPane(), BorderLayout.CENTER);
 
-		setLbColorValue(new JLabel("", SwingConstants.CENTER));
+		setLbColorValue(new JLabel("0", SwingConstants.CENTER));
 		getLbColorValue().setBorder(BorderFactory.createTitledBorder("Color Value"));
-		//getLbColorValue().setHorizontalTextPosition(SwingConstants.CENTER);
+		// getLbColorValue().setHorizontalTextPosition(SwingConstants.CENTER);
 
-		setLbCount(new JLabel("", SwingConstants.CENTER));
+		setLbCount(new JLabel("0", SwingConstants.CENTER));
 		getLbCount().setBorder(BorderFactory.createTitledBorder("Ocurrences"));
-		//getLbCount().setHorizontalTextPosition(SwingConstants.CENTER);
+		// getLbCount().setHorizontalTextPosition(SwingConstants.CENTER);
 
 		getPanel1().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 		getPanel2().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));

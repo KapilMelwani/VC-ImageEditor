@@ -2,6 +2,8 @@ package main;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import utils.HistogramUtils;
 
@@ -93,14 +95,35 @@ public class LUT {
 		return aux;
 	}
 
-	public int[] weightedCount() {
-		int[] aux = grayCount();
-		int total = Arrays.stream(aux).sum();
+	public int[] normalizedCount() {
+		int[] gray = grayCount();
+		double[] aux = new double[gray.length];
+		double total = lut.length * lut[0].length;
+		
+		System.out.println(total);
 		for(int i = 0; i < aux.length; i++) {
-			System.out.println(aux[i]);
-			aux[i] = (aux[i] / total) * 100;
+			aux[i] = gray[i] / total;
 		}
-		return aux;
+		double min = minNotZero(aux);
+		String text = Double.toString(Math.abs(min));
+		int integerPlaces = text.indexOf('.');
+		int decimalPlaces = text.length() - integerPlaces - 1;
+		int factor = (int) Math.pow(10, decimalPlaces);
+		System.out.println(factor);
+		for(int i = 0; i < aux.length; i++) {
+			double x = aux[i] * factor;
+			gray[i] = (int) (aux[i] * factor);
+			System.out.print(x + " - ");
+		}
+		return gray;
+	}
+	
+	private double minNotZero(double[] values) {
+		double min = Double.MAX_VALUE;
+		for(double i : values)
+			if(i != 0.0 && i < min)
+				min = i;
+		return min;
 	}
 
 }

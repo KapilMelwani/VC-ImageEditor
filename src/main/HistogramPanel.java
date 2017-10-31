@@ -67,6 +67,7 @@ public class HistogramPanel extends JPanel {
 		newCheckBoxMenuItem.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				newLayer.setVisible(newCheckBoxMenuItem.getState());
+				layers.add(layers.size()-1, layers.remove(layers.indexOf(newLayer)));
 				repaint();
 			}
 		});
