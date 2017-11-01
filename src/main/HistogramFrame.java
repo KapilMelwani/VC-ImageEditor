@@ -70,6 +70,7 @@ public class HistogramFrame extends Frame {
 				File selectedFile = ImageUtils.openImage();
 				if(selectedFile == null)
 					return;
+				
 			}
 		});
 		
