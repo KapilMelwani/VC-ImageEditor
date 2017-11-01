@@ -79,7 +79,6 @@ public class HistogramFrame extends Frame {
 			public void actionPerformed(ActionEvent e) {
 				BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
 				int[][] gray  = lut.getGrayMatrix();
-				System.out.println(gray.length + " x " + gray[0].length);
 				int[] grayAcc = lut.cumulativeCount();
 				int[][] result = equalizeMatrix(grayAcc, gray);
 				for(int i = 0; i < result.length; i++)
