@@ -17,7 +17,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import utils.HistogramUtils;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")
@@ -28,7 +27,7 @@ public class HistogramFrame extends Frame {
 	private LUT lut;
 
 	private JLabel lbColorValue, lbCount;
-	private JButton btnSpecify;
+	private JButton btnSpecify, btnEqualize;
 
 	public HistogramFrame(Frame parent) {
 		super(parent);
@@ -48,11 +47,9 @@ public class HistogramFrame extends Frame {
 
 		getPanel1().newHistogramLayer(lut.grayCount(), Color.DARK_GRAY, true, "Gray");
 		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.MAGENTA, true, "Cumulative");
-		getPanel3().newHistogramLayer(lut.normalizedCount(), Color.DARK_GRAY, true, "Weighted");
 
 		getTabbedPane().addTab("Color", getPanel1());
 		getTabbedPane().addTab("Cumulative", getPanel2());
-		getTabbedPane().addTab("Weighted", getPanel3());
 		getTabbedPane().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				System.out.println("Tab: " + tabbedPane.getSelectedIndex());
@@ -73,24 +70,63 @@ public class HistogramFrame extends Frame {
 				File selectedFile = ImageUtils.openImage();
 				if(selectedFile == null)
 					return;
-				BufferedImage spec = ImageUtils.readImage(selectedFile.getAbsolutePath());
+				/*BufferedImage spec = ImageUtils.readImage(selectedFile.getAbsolutePath());
+				int a[] = new int[L+1];
+		        for(int i = 0; i < L; i++) {
+		            a[i] = (int)Math.floor(((L-1)*histogramaNormal[i])/(ancho*alto));
+		        }
 				LUT lut = new LUT(spec);
+				*/
+			}
+		});
+		
+		setBtnEqualize(new JButton("Equalize"));
+		getBtnEqualize().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int[] acc = lut.cumulativeCount();
+				int L = acc.length;
+				int a[] = new int[L];
+		        for(int i = 0; i < L; i++) {
+		            a[i] = (int)Math.floor(((L-1)*acc[i])/(lut.getHeight() * lut.getWidth()));
+		        }
+		        BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
+		        LUT newlut = new LUT(aux);
+		        int[][] gray = new int[aux.getWidth()][aux.getHeight()];
+		        for(int i = 0; i < aux.getHeight(); i++)
+		        	for(int j = 0; j < aux.getWidth(); j++)
+		        		gray[j][i] = newlut.getGray(j, i);
+		        
+		        for(int i = 0; i < aux.getHeight(); i++)
+		        	for(int j = 0; j < aux.getWidth(); j++)
+		        		gray[j][i] = a[gray[j][i]];
+		        
+		        for(int i = 0; i < aux.getHeight(); i++)
+		        	for(int j = 0; j < aux.getWidth(); j++)
+		        		aux.setRGB(j, i, new Color(gray[j][i],gray[j][i],gray[j][i]).getRGB());
+		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent);
 			}
 		});
 
 		getPanel1().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 		getPanel2().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
-		getPanel3().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 
-		JPanel aux = new JPanel(new GridLayout(1, 2));
+		JPanel aux = new JPanel(new GridLayout(1, 4));
 		aux.add(lbColorValue);
 		aux.add(lbCount);
 		aux.add(btnSpecify);
+		aux.add(btnEqualize);
 		add(aux, BorderLayout.SOUTH);
 
 		setLocationByPlatform(true);
 		setResizable(false);
 		pack();
+	}
+	
+	public int[] normalize(double[] norm, int height) {
+		int[] aux = new int[norm.length];
+		for(int i = 0; i < norm.length; i++)
+			aux[i] = (int) norm[i] * height;
+		return aux;
 	}
 
 	public HistogramPanel getPanel1() {
@@ -155,6 +191,14 @@ public class HistogramFrame extends Frame {
 
 	public void setBtnSpecify(JButton btnSpecify) {
 		this.btnSpecify = btnSpecify;
+	}
+
+	public JButton getBtnEqualize() {
+		return btnEqualize;
+	}
+
+	public void setBtnEqualize(JButton btnEqualize) {
+		this.btnEqualize = btnEqualize;
 	}
 
 }

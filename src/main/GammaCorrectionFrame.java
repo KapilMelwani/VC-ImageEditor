@@ -73,7 +73,7 @@ public class GammaCorrectionFrame extends Frame {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++) {
 				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
-				aux.setRGB(row, col, ImageUtils.gamma(image.getRGB(row, col), gamma));
+				aux.setRGB(col, row, ImageUtils.gamma(image.getRGB(col, row), gamma));
 			}
 	}
 

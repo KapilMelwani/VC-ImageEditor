@@ -71,29 +71,13 @@ public class LinearAdjustmentFrame extends Frame {
 		setMinimumSize(new Dimension(300, 50));
 		pack();
 	}
-	/*
-	private void changeBr(int offset) {
-		for (int row = 0; row < image.getHeight(); row++)
-			for (int col = 0; col < image.getWidth(); col++) {
-				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
-				aux.setRGB(row, col, ImageUtils.brighten(image.getRGB(row, col), offset));
-			}
-	}
 	
-	private void changeCn(int contrast) {
-		for (int row = 0; row < image.getHeight(); row++)
-			for (int col = 0; col < image.getWidth(); col++) {
-				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
-				aux.setRGB(row, col, ImageUtils.contrast(image.getRGB(row, col), contrast));
-			}
-	}
-	*/
 	private void changeBrCn(int contrast, int offset) {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++) {
 				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
-				aux.setRGB(row, col, ImageUtils.contrast(image.getRGB(row, col), contrast));
-				aux.setRGB(row, col, ImageUtils.brighten(aux.getRGB(row, col), offset));
+				aux.setRGB(col, row, ImageUtils.contrast(image.getRGB(col, row), contrast));
+				aux.setRGB(col, row, ImageUtils.brighten(aux.getRGB(col, row), offset));
 			}
 	}
 	

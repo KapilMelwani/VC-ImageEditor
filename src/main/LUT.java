@@ -44,6 +44,22 @@ public class LUT {
 				}
 		isGrayscale = true;
 	}
+	
+	public RGB get(int i, int j) {
+		return lut[i][j];
+	}
+	
+	public int getGray(int i, int j) {
+		return lut[i][j].gray();
+	}
+	
+	public int getWidth() {
+		return lut.length;
+	}
+	
+	public int getHeight() {
+		return lut[0].length;
+	}
 
 	public boolean isGrayscale() {
 		return this.isGrayscale;
@@ -100,7 +116,7 @@ public class LUT {
 		return aux;
 	}
 
-	public int[] normalizedCount() {
+	public double[] normalizedCount() {
 		int[] gray = grayCount();
 		double[] aux = new double[gray.length];
 		double total = lut.length * lut[0].length;
@@ -109,30 +125,11 @@ public class LUT {
 		for(int i = 0; i < aux.length; i++) {
 			aux[i] = gray[i] / total;
 		}
-		double min = minNotZero(aux);
-		String text = Double.toString(Math.abs(min));
-		int integerPlaces = text.indexOf('.');
-		int decimalPlaces = text.length() - integerPlaces - 1;
-		int factor = (int) Math.pow(10, decimalPlaces);
-		System.out.println(factor);
-		for(int i = 0; i < aux.length; i++) {
-			double x = aux[i] * factor;
-			gray[i] = (int) (aux[i] * factor);
-			System.out.print(x + " - ");
-		}
-		return gray;
-	}
-	
-	private double minNotZero(double[] values) {
-		double min = Double.MAX_VALUE;
-		for(double i : values)
-			if(i != 0.0 && i < min)
-				min = i;
-		return min;
+		return aux;
 	}
 	
 	public int[][] specify(BufferedImage image) {
-		int[] norm = new LUT(HistogramUtils.getLUT(image)).normalizedCount();
+		double[] norm = new LUT(HistogramUtils.getLUT(image)).normalizedCount();
 		int height = image.getHeight();
 		int width = image.getWidth();
 		int[][] aux = new int[height][width];

@@ -9,11 +9,11 @@ public class HistogramUtils {
 	public static RGB[][] getLUT(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		RGB[][] lut = new RGB[height][width];
+		RGB[][] lut = new RGB[width][height];
 
 		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++)
-				lut[i][j] = new RGB(image.getRGB(i, j));
+				lut[j][i] = new RGB(image.getRGB(j, i));
 		return lut;
 	}
 	

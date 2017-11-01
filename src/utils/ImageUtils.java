@@ -170,14 +170,15 @@ public class ImageUtils {
 		BufferedImage image = rgbToGrayscaleCopyAuto(original);
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
-				int value = ImageUtils.intToRGB(image.getRGB(row, col))[0];
+				int value = ImageUtils.intToRGB(image.getRGB(col, row))[0];
 				for (FunctionSegment segment : f) {
-					if (segment.getP1().getX() < value) {
-						value = (int) segment.f(value);
+					if (segment.getP1().getX() <= value) {
+						value = ImageUtils.truncate((int) segment.f(value));
 						break;
 					}
 				}
-				image.setRGB(row, col, ImageUtils.rgbToInt(value, value, value));
+				
+				image.setRGB(col, row, ImageUtils.rgbToInt(value, value, value));
 			}
 		}
 		return image;

@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
 	private PixelColorPanel pnMousePixelColor;
 
 	private ImageFrame focusedFrame;
-	private JMenu mnEdit, mntmColor;
+	private JMenu mnEdit, mntmColor, mnOrignal;
 	//private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
 
 	/**
@@ -193,6 +193,19 @@ public class MainFrame extends JFrame {
 			}
 		});	    
 		mnEdit.add(mntmGammaCorrect);
+		
+		mnOrignal = new JMenu("Original");
+		menuBar.add(mnOrignal);
+		
+		mntmShowOriginal = new JMenuItem("Show Original");
+		mntmShowOriginal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				focusedFrame.showParent();
+			}
+		});	    
+		mnOrignal.add(mntmShowOriginal);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
