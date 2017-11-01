@@ -45,6 +45,38 @@ public class LUT {
 		isGrayscale = true;
 	}
 	
+	public int[][] getRedMatrix() {
+		int[][] aux = new int[getWidth()][getHeight()];
+		for(int row = 0; row < getHeight(); row++)
+			for(int col = 0; col < getWidth(); col++)
+				aux[col][row] = lut[col][row].getRed();
+		return aux;
+	}
+	
+	public int[][] getGreenMatrix() {
+		int[][] aux = new int[getWidth()][getHeight()];
+		for(int row = 0; row < getHeight(); row++)
+			for(int col = 0; col < getWidth(); col++)
+				aux[col][row] = lut[col][row].getGreen();
+		return aux;
+	}
+	
+	public int[][] getBlueMatrix() {
+		int[][] aux = new int[getWidth()][getHeight()];
+		for(int row = 0; row < getHeight(); row++)
+			for(int col = 0; col < getWidth(); col++)
+				aux[col][row] = lut[col][row].getBlue();
+		return aux;
+	}
+	
+	public int[][] getGrayMatrix() {
+		int[][] aux = new int[getWidth()][getHeight()];
+		for(int row = 0; row < getHeight(); row++)
+			for(int col = 0; col < getWidth(); col++)
+				aux[col][row] = lut[col][row].gray();
+		return aux;
+	}
+	
 	public RGB get(int i, int j) {
 		return lut[i][j];
 	}
@@ -74,7 +106,7 @@ public class LUT {
 				aux[lut[i][j].getRed()]++;
 		return aux;
 	}
-
+	
 	public int[] greenCount() {
 		int[] aux = new int[N_COLOR_VALUES];
 		for (int i = 0; i < aux.length; i++)
@@ -113,6 +145,27 @@ public class LUT {
 		int[] aux = grayCount();
 		for(int i = 1; i < aux.length; i++)
 			aux[i] = aux[i] + aux[i-1];
+		return aux;
+	}
+	
+	public int[] cumulativeRedCount() {
+		int[] aux = redCount();
+		for (int i = 1; i < aux.length; i++)
+			aux[i] = aux[i-1] + aux[i];
+		return aux;
+	}
+	
+	public int[] cumulativeGreenCount() {
+		int[] aux = greenCount();
+		for (int i = 1; i < aux.length; i++)
+			aux[i] = aux[i-1] + aux[i];
+		return aux;
+	}
+	
+	public int[] cumulativeBlueCount() {
+		int[] aux = blueCount();
+		for (int i = 1; i < aux.length; i++)
+			aux[i] = aux[i-1] + aux[i];
 		return aux;
 	}
 

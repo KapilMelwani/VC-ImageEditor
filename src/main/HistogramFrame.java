@@ -27,7 +27,7 @@ public class HistogramFrame extends Frame {
 	private LUT lut;
 
 	private JLabel lbColorValue, lbCount;
-	private JButton btnSpecify, btnEqualize;
+	private JButton btnSpecify, btnEqualize, btnEqualizeRGB;
 
 	public HistogramFrame(Frame parent) {
 		super(parent);
@@ -52,7 +52,7 @@ public class HistogramFrame extends Frame {
 		getTabbedPane().addTab("Cumulative", getPanel2());
 		getTabbedPane().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				System.out.println("Tab: " + tabbedPane.getSelectedIndex());
+				//System.out.println("Tab: " + tabbedPane.getSelectedIndex());
 				pack();
 			}
 		});
@@ -77,26 +77,34 @@ public class HistogramFrame extends Frame {
 		setBtnEqualize(new JButton("Equalize"));
 		getBtnEqualize().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int[] acc = lut.cumulativeCount();
-				int L = acc.length;
-				int a[] = new int[L];
-		        for(int i = 0; i < L; i++) {
-		            a[i] = (int)Math.floor(((L-1)*acc[i])/(lut.getHeight() * lut.getWidth()));
-		        }
-		        BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
-		        LUT newlut = new LUT(aux);
-		        int[][] gray = new int[aux.getWidth()][aux.getHeight()];
-		        for(int i = 0; i < aux.getHeight(); i++)
-		        	for(int j = 0; j < aux.getWidth(); j++)
-		        		gray[j][i] = newlut.getGray(j, i);
-		        
-		        for(int i = 0; i < aux.getHeight(); i++)
-		        	for(int j = 0; j < aux.getWidth(); j++)
-		        		gray[j][i] = a[gray[j][i]];
-		        
-		        for(int i = 0; i < aux.getHeight(); i++)
-		        	for(int j = 0; j < aux.getWidth(); j++)
-		        		aux.setRGB(j, i, new Color(gray[j][i],gray[j][i],gray[j][i]).getRGB());
+				BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
+				int[][] gray  = lut.getGrayMatrix();
+				System.out.println(gray.length + " x " + gray[0].length);
+				int[] grayAcc = lut.cumulativeCount();
+				int[][] result = equalizeMatrix(grayAcc, gray);
+				for(int i = 0; i < result.length; i++)
+		        	for(int j = 0; j < result[i].length; j++)
+		        		aux.setRGB(i, j, new Color(result[i][j],result[i][j],result[i][j]).getRGB());
+		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent);
+			}
+		});
+		
+		setBtnEqualizeRGB(new JButton("Equalize RGB"));
+		getBtnEqualizeRGB().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
+				int[][] red  = lut.getRedMatrix();
+				int[][] green  = lut.getGreenMatrix();
+				int[][] blue  = lut.getBlueMatrix();
+				int[] redAcc = lut.cumulativeRedCount();
+				int[] greenAcc = lut.cumulativeGreenCount();
+				int[] blueAcc = lut.cumulativeBlueCount();
+				int[][] resultR = equalizeMatrix(redAcc, red);
+				int[][] resultG = equalizeMatrix(greenAcc, green);
+				int[][] resultB = equalizeMatrix(blueAcc, blue);
+				for(int i = 0; i < resultR.length; i++)
+		        	for(int j = 0; j < resultR[i].length; j++)
+		        		aux.setRGB(i, j, new Color(resultR[i][j],resultG[i][j],resultB[i][j]).getRGB());
 		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent);
 			}
 		});
@@ -104,16 +112,34 @@ public class HistogramFrame extends Frame {
 		getPanel1().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 		getPanel2().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
 
-		JPanel aux = new JPanel(new GridLayout(1, 4));
-		aux.add(lbColorValue);
-		aux.add(lbCount);
-		aux.add(btnSpecify);
-		aux.add(btnEqualize);
+		JPanel aux = new JPanel(new GridLayout(1, 2));
+		JPanel auxSub1 = new JPanel(new GridLayout(1, 2));
+		JPanel auxSub2 = new JPanel(new GridLayout(1, 3));
+		aux.add(auxSub1);
+		aux.add(auxSub2);
+		
+		auxSub1.add(lbColorValue);
+		auxSub1.add(lbCount);
+		auxSub2.add(btnSpecify);
+		auxSub2.add(btnEqualize);
+		auxSub2.add(btnEqualizeRGB);
 		add(aux, BorderLayout.SOUTH);
 
 		setLocationByPlatform(true);
 		setResizable(false);
 		pack();
+	}
+	
+	public int[][] equalizeMatrix(int[] cumulative, int[][] color) {
+		int L = cumulative.length;
+		int a[] = new int[L];
+        for(int i = 0; i < L; i++)
+            a[i] = (int)Math.floor(((L-1)*cumulative[i])/(color[0].length * color.length));
+        
+        for(int i = 0; i < color.length; i++)
+        	for(int j = 0; j < color[i].length; j++)
+        		color[i][j] = a[color[i][j]];
+        return color;
 	}
 	
 	public int[] normalize(double[] norm, int height) {
@@ -193,6 +219,14 @@ public class HistogramFrame extends Frame {
 
 	public void setBtnEqualize(JButton btnEqualize) {
 		this.btnEqualize = btnEqualize;
+	}
+
+	public JButton getBtnEqualizeRGB() {
+		return btnEqualizeRGB;
+	}
+
+	public void setBtnEqualizeRGB(JButton btnEqualizeRGB) {
+		this.btnEqualizeRGB = btnEqualizeRGB;
 	}
 
 }
