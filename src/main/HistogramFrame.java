@@ -70,13 +70,6 @@ public class HistogramFrame extends Frame {
 				File selectedFile = ImageUtils.openImage();
 				if(selectedFile == null)
 					return;
-				/*BufferedImage spec = ImageUtils.readImage(selectedFile.getAbsolutePath());
-				int a[] = new int[L+1];
-		        for(int i = 0; i < L; i++) {
-		            a[i] = (int)Math.floor(((L-1)*histogramaNormal[i])/(ancho*alto));
-		        }
-				LUT lut = new LUT(spec);
-				*/
 			}
 		});
 		
