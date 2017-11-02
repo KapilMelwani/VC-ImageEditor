@@ -1,4 +1,4 @@
-package main;
+package frames;
 
 
 import javax.swing.JFrame;
@@ -11,6 +11,7 @@ public class Frame extends JFrame {
 	public Frame(Frame parent) {
 		setParent(parent);
 		setLocationRelativeTo(null);
+		setResizable(false);
 	}
 
 	public Frame getParentFrame() { return parent; }

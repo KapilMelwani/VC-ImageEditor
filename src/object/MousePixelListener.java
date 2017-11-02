@@ -1,4 +1,4 @@
-package main;
+package object;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -6,7 +6,7 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 
-import main.ImageFrame.ImagePanel;
+import frames.ImageFrame.ImagePanel;
 import panels.PixelColorPanel;
 
 public class MousePixelListener implements MouseMotionListener {

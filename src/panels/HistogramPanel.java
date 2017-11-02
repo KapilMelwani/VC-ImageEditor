@@ -1,4 +1,4 @@
-package main;
+package panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,6 +16,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+
+import object.HistogramLayer;
 
 @SuppressWarnings("serial")
 public class HistogramPanel extends JPanel {

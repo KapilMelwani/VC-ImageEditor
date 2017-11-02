@@ -1,4 +1,4 @@
-package main;
+package frames;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import object.MousePixelListener;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")

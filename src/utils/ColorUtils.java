@@ -2,7 +2,7 @@ package utils;
 
 import java.awt.image.BufferedImage;
 
-import main.RGB;
+import object.RGB;
 
 public class ColorUtils {
 	

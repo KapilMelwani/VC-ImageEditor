@@ -23,18 +23,13 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-import main.Frame;
-import main.FunctionSegment;
-import main.GammaCorrectionFrame;
-import main.HistogramFrame;
-import main.ImageFrame;
-import main.LUT;
-import main.LinearAdjustmentFrame;
-import main.LinearTranformationFrame;
-import main.Node;
-import main.MousePixelListener;
+import frames.Frame;
+import frames.ImageFrame;
+import object.FunctionSegment;
+import object.LUT;
+import object.MousePixelListener;
+import object.Node;
 import panels.PixelColorPanel;
-import panels.PropertiesFrame;
 
 public class ImageUtils {
 

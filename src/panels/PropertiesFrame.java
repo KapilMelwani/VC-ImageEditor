@@ -10,8 +10,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import main.Frame;
-import main.ImageFrame;
+import frames.Frame;
+import frames.ImageFrame;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")

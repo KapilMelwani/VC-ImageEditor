@@ -1,4 +1,4 @@
-package main;
+package frames;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,6 +17,9 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import object.LUT;
+import object.MouseHistogramListener;
+import panels.HistogramPanel;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")

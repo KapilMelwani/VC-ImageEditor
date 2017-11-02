@@ -1,10 +1,12 @@
-package main;
+package object;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.List;
 
 import javax.swing.JLabel;
+
+import panels.HistogramPanel;
 
 public class MouseHistogramListener implements MouseMotionListener {
 	

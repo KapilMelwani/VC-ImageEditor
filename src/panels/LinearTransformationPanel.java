@@ -18,8 +18,8 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import main.Node;
-import main.NodeList;
+import object.Node;
+import object.NodeList;
 
 
 @SuppressWarnings("serial")

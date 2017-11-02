@@ -1,8 +1,7 @@
-package main;
+package frames;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -10,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+import object.MousePixelListener;
 import panels.PixelColorPanel;
 import utils.ImageUtils;
 
@@ -52,22 +52,6 @@ public class MainFrame extends JFrame {
 	private ImageFrame focusedFrame;
 	private JMenu mnEdit, mntmColor, mnOrignal;
 	//private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainFrame frame = new MainFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.

@@ -1,4 +1,4 @@
-package main;
+package frames;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -37,14 +37,11 @@ public class LinearTranformationFrame extends JFrame {
 			}
 		});
 		setParent(parent);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().add(getPanel(), BorderLayout.CENTER);
 		JPanel aux = new JPanel(new BorderLayout());
 		aux.add(info, BorderLayout.CENTER);
 		aux.add(btnCreate, BorderLayout.SOUTH);
 		getContentPane().add(aux, BorderLayout.SOUTH);
-		setLocationByPlatform(true);
-		setResizable(false);
 		pack();
 	}
 

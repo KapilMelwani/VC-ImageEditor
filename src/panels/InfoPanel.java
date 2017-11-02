@@ -15,8 +15,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
-import main.FunctionSegment;
-import main.Node;
+import object.FunctionSegment;
+import object.Node;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")
