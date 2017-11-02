@@ -159,7 +159,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchHistogramFrame(focusedFrame);
+				ImageUtils.launchFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmHistogram);
@@ -169,7 +169,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchLinearTransFrame(focusedFrame.getImage(), focusedFrame);
+				ImageUtils.launchFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmLinearTrans);
@@ -179,7 +179,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchLinearAdjustFrame(focusedFrame);
+				ImageUtils.launchFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmLinearAdjust);
@@ -189,7 +189,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchGammaCorrectionFrame(focusedFrame);
+				ImageUtils.launchFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmGammaCorrect);
@@ -199,7 +199,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchPropertiesFrame(focusedFrame);
+				ImageUtils.launchFrame(focusedFrame);
 			}
 		});	    
 		mnEdit.add(mntmProperties);

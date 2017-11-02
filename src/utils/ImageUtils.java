@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+import main.Frame;
 import main.FunctionSegment;
 import main.GammaCorrectionFrame;
 import main.HistogramFrame;
@@ -402,29 +403,9 @@ public class ImageUtils {
 		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
 		frame.setVisible(true);
 	}
-
-	public static void launchHistogramFrame(ImageFrame parent) {
-		HistogramFrame frame = new HistogramFrame(parent);
-		frame.setVisible(true);
-	}
-
-	public static void launchLinearTransFrame(BufferedImage image, ImageFrame parent) {
-		LinearTranformationFrame frame = new LinearTranformationFrame(parent);
-		frame.setVisible(true);
-	}
-
-	public static void launchLinearAdjustFrame(ImageFrame parent) {
-		LinearAdjustmentFrame frame = new LinearAdjustmentFrame(parent);
-		frame.setVisible(true);
-	}
 	
-	public static void launchGammaCorrectionFrame(ImageFrame parent) {
-		GammaCorrectionFrame frame = new GammaCorrectionFrame(parent);
-		frame.setVisible(true);
-	}
-	
-	public static void launchPropertiesFrame(ImageFrame parent) {
-		PropertiesFrame frame = new PropertiesFrame(parent);
+	public static void launchFrame(Frame parent) {
+		Frame frame = new Frame(parent);
 		frame.setVisible(true);
 	}
 
