@@ -11,9 +11,11 @@ import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -25,11 +27,13 @@ import main.FunctionSegment;
 import main.GammaCorrectionFrame;
 import main.HistogramFrame;
 import main.ImageFrame;
+import main.LUT;
 import main.LinearAdjustmentFrame;
 import main.LinearTranformationFrame;
 import main.Node;
 import main.MousePixelListener;
 import panels.PixelColorPanel;
+import panels.PropertiesFrame;
 
 public class ImageUtils {
 
@@ -52,7 +56,7 @@ public class ImageUtils {
 		jfc.setDialogTitle("Select an image");
 		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		jfc.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "jpg", "tif");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "tif");
 		jfc.addChoosableFileFilter(filter);
 		int returnValue = jfc.showOpenDialog(null);
 		File file = null;
@@ -190,19 +194,16 @@ public class ImageUtils {
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-
-	public static int[] getGrayValues(BufferedImage image) {
-		int[] values = new int[256];
-		int index = 0;
+	
+	public static int dynamicRange(BufferedImage image) {
+		LUT lut = new LUT(image);
+		int[][] grays = lut.getGrayMatrix();
+		List<Integer> aux = new ArrayList<Integer>();
 		for (int i = 0; i < image.getWidth(); i++)
-			for (int j = 0; j < image.getHeight(); j++) {
-				Color color = new Color(image.getRGB(i, j));
-				int red = (int) (color.getRed() * NTSC_RED);
-				int green = (int) (color.getGreen() * NTSC_GREEN);
-				int blue = (int) (color.getBlue() * NTSC_BLUE);
-				values[index++] = red + green + blue;
-			}
-		return values;
+			for (int j = 0; j < image.getHeight(); j++)
+				if(!aux.contains(grays[j][i]))
+					aux.add(grays[j][i]);
+		return aux.size();
 	}
 
 	public static boolean isGrayscale(BufferedImage image) {
@@ -250,6 +251,11 @@ public class ImageUtils {
 			}
 		return new Point(min, max);
 	}
+	
+	public static double entropy(BufferedImage bi) {
+		
+		return 0.0d;
+	}
 
 	public static BufferedImage changeBrightness(BufferedImage original, float val) {
 		RescaleOp brighterOp = new RescaleOp(val, 0, null);
@@ -263,19 +269,6 @@ public class ImageUtils {
 	public static BufferedImage changeContrastBrightness(BufferedImage image, int brightness, float contrast) {
 		RescaleOp rescale = new RescaleOp(contrast, brightness, null);
 		return rescale.filter(image, null);
-	}
-	
-	public static double maxContrast(BufferedImage image) {
-		int[] aux = new int[image.getWidth()*image.getHeight()];
-		int k = 0;
-		for (int row = 0; row < image.getHeight(); row++)
-			for (int col = 0; col < image.getWidth(); col++)
-				aux[k++] = ImageUtils.brightness(image.getRGB(row, col));
-		int sum = 0;
-        for(int num : aux)
-            sum += num;
-        double mean = sum/aux.length;
-		return ImageUtils.contrast(image) + mean;
 	}
 
 	public static double contrast(BufferedImage image) {
@@ -371,6 +364,22 @@ public class ImageUtils {
 			value = 255;
 		return value;
 	}
+	
+	public static Map.Entry<Integer, Integer> grayRange(BufferedImage bi) {
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
+		BufferedImage grayscale = rgbToGrayscaleCopyAuto(bi);
+
+		for (int i = 0; i < grayscale.getWidth(); i++)
+			for (int j = 0; j < grayscale.getHeight(); j++) {
+				Color color = new Color(grayscale.getRGB(i, j));
+				if (color.getRed() > max)
+					max = color.getRed();
+				if (color.getRed() < min)
+					min = color.getRed();
+			}
+		return new AbstractMap.SimpleEntry<Integer, Integer>(min, max);
+	}
 
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
 			PixelColorPanel pnMousePixelColor) {
@@ -411,6 +420,11 @@ public class ImageUtils {
 	
 	public static void launchGammaCorrectionFrame(ImageFrame parent) {
 		GammaCorrectionFrame frame = new GammaCorrectionFrame(parent);
+		frame.setVisible(true);
+	}
+	
+	public static void launchPropertiesFrame(ImageFrame parent) {
+		PropertiesFrame frame = new PropertiesFrame(parent);
 		frame.setVisible(true);
 	}
 

@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal, mntmProperties;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
 	 */
 	public MainFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(0, 0, 450, 300);
 		setResizable(false);
 		focusedFrame = null;
 		menuBar = new JMenuBar();
@@ -147,7 +147,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				createNewImageFrame(ImageUtils.rgbToGrayscaleCopyAuto(focusedFrame.getImage()), focusedFrame);
+				ImageUtils.createNewImageFrame(ImageUtils.rgbToGrayscaleCopyAuto(focusedFrame.getImage()), focusedFrame);
 			}
 		});
 	    mntmColor.add(mntmToGrayscale);
@@ -193,6 +193,16 @@ public class MainFrame extends JFrame {
 			}
 		});	    
 		mnEdit.add(mntmGammaCorrect);
+		
+		mntmProperties = new JMenuItem("Properties");
+		mntmProperties.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				ImageUtils.launchPropertiesFrame(focusedFrame);
+			}
+		});	    
+		mnEdit.add(mntmProperties);
 		
 		mnOrignal = new JMenu("Original");
 		menuBar.add(mnOrignal);
