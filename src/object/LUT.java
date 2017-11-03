@@ -148,6 +148,15 @@ public class LUT {
 		return aux;
 	}
 	
+	public double[] cumulativeNormalizedCount() {
+		int[] aux = cumulativeCount();
+		double[] auxDouble = new double[aux.length];
+		int total = lut.length * lut[0].length;
+		for(int i = 0; i < aux.length; i++)
+			auxDouble[i] = aux[i] / total;
+		return auxDouble;
+	}
+	
 	public int[] cumulativeRedCount() {
 		int[] aux = redCount();
 		for (int i = 1; i < aux.length; i++)
@@ -173,8 +182,6 @@ public class LUT {
 		int[] gray = grayCount();
 		double[] aux = new double[gray.length];
 		double total = lut.length * lut[0].length;
-		
-		System.out.println(total);
 		for(int i = 0; i < aux.length; i++) {
 			aux[i] = gray[i] / total;
 		}

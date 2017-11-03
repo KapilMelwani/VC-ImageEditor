@@ -53,7 +53,7 @@ public class LinearTransformationPanel extends JPanel {
 					return;
 				
 				Node node = getNode(p.x, p.y);
-				if(node != null && node.isMoveable()) {
+				if(node != null/* && node.isMoveable()*/) {
 					drag = true;
 					dragNode = node;
 				}
@@ -212,9 +212,12 @@ public class LinearTransformationPanel extends JPanel {
 	}
 
 	public void moveNode(Node node, int x, int y) {
-		if(!node.isMoveable() ||x >= MAX_SCORE || y >= MAX_SCORE || x < 0 || y < 0)
+		if(x >= MAX_SCORE || y >= MAX_SCORE || x < 0 || y < 0)
 			return;
-		node.setCoordinates(x, y);
+		if(node.isMoveable())
+			node.setCoordinates(x, y);
+		else
+			node.setCoordinates(node.getX(), y);
 		nodes.sort();
 		nodes.manualNotify();
 	}

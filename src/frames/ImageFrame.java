@@ -11,10 +11,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.text.DecimalFormat;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import object.MousePixelListener;
 import utils.ImageUtils;
@@ -31,14 +29,26 @@ public class ImageFrame extends Frame {
 	private MousePixelListener mousePixelListener;
 
 	public ImageFrame(String file) {
-		this(ImageUtils.readImage(file), null);
+		super(null);
+		this.image = new Image(file);
+		
 		setTitle(image.getFileName());
+		setPanel(this.new ImagePanel());
+		setLbInfo(new JLabel());
+		refreshImageInfo();
+		setImageScaledDim(ImageUtils.scaleImage(this.image.getImageDimension()));
+
+		// AWT STUFF
+		add(getPanel(), BorderLayout.CENTER);
+		getPanel().setPreferredSize(getImageScaledDim());
+		add(getLbInfo(), BorderLayout.NORTH);
+		pack();
 	}
 
 	public ImageFrame(BufferedImage image, ImageFrame parent) {
 		super(parent);
-		
 		this.image = new Image(image);
+		this.image.setPath(parent.image.getPath());
 		
 		setPanel(this.new ImagePanel());
 		setLbInfo(new JLabel());
@@ -114,14 +124,12 @@ public class ImageFrame extends Frame {
 	}
 
 	public class ImagePanel extends JPanel {
-		//private BufferedImage image;
 		private boolean drag;
 		private boolean roi;
 		
 		private Point start, end;
 
 		public ImagePanel() {
-			//setImage(image);
 			addMouseListener(new MouseAdapter() {
 
 				@Override
@@ -140,9 +148,10 @@ public class ImageFrame extends Frame {
 					int height = start.y - end.y;
 					int x = Math.min(start.x, end.x);
 					int y = Math.min(start.y, end.y);
-					System.out.println("("+ x + ", " + y + ") --> W: " + width + ", H: " + height);
 					ImageFrame frame = ImageUtils.getImageFrame(e.getComponent());
-					ImageUtils.createNewImageFrame(image.getSubimage(x, y, Math.abs(width), Math.abs(height)), frame);
+					width = (int) (Math.abs(width) * getScale());
+					height = (int) (Math.abs(height) * getScale());
+					ImageUtils.createNewImageFrame(image.getSubimage(x, y, width, height), frame);
 					start = null;
 					end = null;
 					roi = false;
@@ -151,7 +160,6 @@ public class ImageFrame extends Frame {
 			});
 			
 			addMouseMotionListener(new MouseMotionAdapter() {
-
 				@Override
 				public void mouseDragged(MouseEvent e) {
 					if(drag) {
@@ -174,18 +182,12 @@ public class ImageFrame extends Frame {
 				int x = Math.min(start.x, end.x);
 				int y = Math.min(start.y, end.y);
 				g.drawRect(x, y, Math.abs(width), Math.abs(height));
-				
 			}
 		}
-/*
-		public BufferedImage getImage() {
-			return image;
-		}
-*/
+		
 		public double getScale() {
 			return (double) ((double) image.getWidth() / (double) getWidth());
 		}
-
 		public boolean isDrag() {
 			return drag;
 		}

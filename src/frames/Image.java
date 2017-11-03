@@ -2,7 +2,10 @@ package frames;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
+import object.FunctionSegment;
+import object.LUT;
 import utils.ColorUtils;
 import utils.ImageUtils;
 
@@ -15,14 +18,12 @@ public class Image {
 		setPath(path);
 		setImage(ImageUtils.readImage(getPath()));
 		setOriginal(ImageUtils.readImage(getPath()));
-		System.out.println("A --> " + (image == original));
 	}
 	
 	public Image(BufferedImage image) {
 		setPath(null);
 		setImage(ImageUtils.copyImage(image));
 		setOriginal(ImageUtils.copyImage(image));
-		System.out.println("B --> " + (image == original));
 	}
 	
 	public Dimension getImageDimension() {
@@ -103,6 +104,52 @@ public class Image {
 				image.setRGB(col, row, ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]));
 			}
 		}
+	}
+	
+	public boolean isGrayscale() {
+		int i = image.getType();
+		if(i == BufferedImage.TYPE_BYTE_GRAY)
+			return true;
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++) {
+				int[] rgb = ColorUtils.intToRGB(original.getRGB(col, row));
+				if(rgb[0] != rgb[1] || rgb[1] != rgb[2] || rgb[0] != rgb[2])
+					return false;
+			}
+		return true;
+	}
+	
+	public BufferedImage linearTransform(List<FunctionSegment> f) {
+		BufferedImage aux = ImageUtils.copyImage(image());
+		for (int row = 0; row < aux.getHeight(); row++) {
+			for (int col = 0; col < aux.getWidth(); col++) {
+				int[] rgb = ColorUtils.intToRGB(aux.getRGB(col, row));
+				for(int i = 0; i <rgb.length; i++) {
+					for (FunctionSegment segment : f) {
+						if (segment.getP1().getX() <= rgb[i]) {
+							rgb[i] = ImageUtils.truncate((int) segment.f(rgb[i]));
+							break;
+						}
+					}
+				}
+				aux.setRGB(col, row, ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]));
+			}
+		}
+		return aux;
+	}
+	
+	public double shannonEntropy() {
+		double[] normalized = new LUT(image()).normalizedCount();
+		double entropy = 0.0d;
+		for(int i = 0; i < normalized.length; i++)
+			entropy -= normalized[i] * log2(normalized[i]);
+		return entropy;
+	}
+	
+	public static double log2(double value) {
+		if(value == 0)
+			return 0;
+		return Math.log(value) / Math.log(2);
 	}
 	
 	public BufferedImage image() { return image; }

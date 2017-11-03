@@ -73,7 +73,28 @@ public class HistogramFrame extends Frame {
 				File selectedFile = ImageUtils.openImage();
 				if(selectedFile == null)
 					return;
-				
+				Image desired = new Image(selectedFile.getAbsolutePath());
+				double[] sk = new LUT(getParentFrame().getImage()).cumulativeNormalizedCount();
+				double[] zk = new LUT(desired.image()).cumulativeNormalizedCount();
+				double[] z = new double[sk.length];
+				int[] n = new int[sk.length];
+				int zki = 0, ski = 0, zi = 0, ni = 0;
+				while(zki < zk.length) {
+					double value = zk[zki] - sk[ski];
+					while(value < 0) {
+						value = zk[zki] - sk[++ski];
+					}
+					z[zi] = value;
+					n[ni++] = zki++;
+				}
+				BufferedImage aux = new Image(ImageUtils.copyImage(parent.getImage())).toGrayScale();
+				for(int row = 0; row < aux.getHeight(); row++)
+					for(int col = 0; col < aux.getWidth(); col++) {
+						int value = new Color(aux.getRGB(col, row)).getRed();
+						int newColor = new Color(n[value], n[value], n[value]).getRGB();
+						aux.setRGB(col, row, newColor);
+					}
+				ImageUtils.createNewImageFrame(aux, getParentFrame());	
 			}
 		});
 		
@@ -116,7 +137,11 @@ public class HistogramFrame extends Frame {
 
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		JPanel auxSub1 = new JPanel(new GridLayout(1, 2));
-		JPanel auxSub2 = new JPanel(new GridLayout(1, 3));
+		JPanel auxSub2 = null;
+		if(getParentFrame().image.isGrayscale())
+			auxSub2 = new JPanel(new GridLayout(1, 2));
+		else
+			auxSub2 = new JPanel(new GridLayout(1, 3));
 		aux.add(auxSub1);
 		aux.add(auxSub2);
 		
@@ -124,9 +149,10 @@ public class HistogramFrame extends Frame {
 		auxSub1.add(lbCount);
 		auxSub2.add(btnSpecify);
 		auxSub2.add(btnEqualize);
-		auxSub2.add(btnEqualizeRGB);
+		if(!getParentFrame().image.isGrayscale())
+			auxSub2.add(btnEqualizeRGB);
+		
 		add(aux, BorderLayout.SOUTH);
-
 		pack();
 	}
 	

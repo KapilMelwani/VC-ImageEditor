@@ -55,7 +55,7 @@ public class ImageUtils {
 		jfc.setDialogTitle("Select an image");
 		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		jfc.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "tif");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and BMP images", "png", "bmp", "tif", "jpg");
 		jfc.addChoosableFileFilter(filter);
 		int returnValue = jfc.showOpenDialog(null);
 		File file = null;
@@ -68,15 +68,15 @@ public class ImageUtils {
 		double scale = 1.0;
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension bounds = new Dimension((int) (screen.getWidth() * 0.75), (int) (screen.getHeight() * 0.75));
-		System.out.println("Bounds = " + bounds);
-		System.out.println("ImageIn = " + image);
+		//System.out.println("Bounds = " + bounds);
+		//System.out.println("ImageIn = " + image);
 		while (image.getWidth() > bounds.getWidth() || image.getHeight() > bounds.getHeight()) {
 			scale -= 0.05;
 			int width = (int) (image.getWidth() * scale);
 			int height = (int) (image.getHeight() * scale);
 			image = new Dimension(width, height);
 		}
-		System.out.println("ImageOut = " + image);
+		//System.out.println("ImageOut = " + image);
 		return image;
 	}
 
@@ -243,7 +243,7 @@ public class ImageUtils {
 		int k = 0;
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
-				aux[k++] = ImageUtils.brightness(image.getRGB(row, col));
+				aux[k++] = ImageUtils.brightness(image.getRGB(col, row));
 			}
 		}
 		
@@ -268,7 +268,7 @@ public class ImageUtils {
 		int total = image.getWidth() * image.getHeight();
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
-				sum += ImageUtils.brightness(image.getRGB(row, col));
+				sum += ImageUtils.brightness(image.getRGB(col, row));
 			}
 		}
 		return sum / total;

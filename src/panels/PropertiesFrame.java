@@ -16,11 +16,11 @@ import utils.ImageUtils;
 @SuppressWarnings("serial")
 public class PropertiesFrame extends Frame {
 
-	private JLabel categFormat, categResolution, categRange, categBrightness, categContrast, categDynRange;
+	private JLabel categFormat, categResolution, categRange, categBrightness, categContrast, categDynRange, categEntropy;
 
 	public PropertiesFrame(ImageFrame parent) {
 		super(parent);
-		setLayout(new GridLayout(6, 1));
+		setLayout(new GridLayout(7, 1));
 		
 		BufferedImage image = parent.image.image();
 		
@@ -60,6 +60,12 @@ public class PropertiesFrame extends Frame {
 		categDynRange.setHorizontalAlignment(SwingConstants.CENTER);
 		categDynRange.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		add(categDynRange);
+		
+		categEntropy = new JLabel(String.valueOf(parent.image.shannonEntropy()));
+		categEntropy.setBorder(BorderFactory.createTitledBorder("Entropy"));
+		categEntropy.setHorizontalAlignment(SwingConstants.CENTER);
+		categEntropy.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+		add(categEntropy);
 		// TODO Auto-generated constructor stub
 		pack();
 	}

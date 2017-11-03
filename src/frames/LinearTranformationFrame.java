@@ -31,7 +31,8 @@ public class LinearTranformationFrame extends Frame {
 		btnCreate = new JButton("Transform Image");
 		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BufferedImage image = ImageUtils.linearTransform(((ImageFrame)parent).getImage(), ImageUtils.returnSegments(panel.getNodes().getList()));
+				
+				BufferedImage image = getParentFrame().image.linearTransform(ImageUtils.returnSegments(panel.getNodes().getList()));
 				ImageUtils.createNewImageFrame(image, parent);
 				((JFrame) SwingUtilities.getRoot((Component) e.getSource())).dispose();
 			}
