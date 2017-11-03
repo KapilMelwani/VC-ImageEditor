@@ -9,7 +9,8 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -17,38 +18,43 @@ import javax.swing.event.ChangeListener;
 public class LinearAdjustmentFrame extends Frame {
 
 	public final static int MIN_BRIGHTNESS = -255;
-	public final static int MAX_BRIGHTNESS = 255;
+	public final static int MAX_BRIGHTNESS = 510;
 	public final static int MIN_CONTRAST = -255;
-	public final static int MAX_CONTRAST = 255;
+	public final static int MAX_CONTRAST = 510;
 
-	private JSlider sliderBrightness, sliderContrast;
+	private JSpinner spinnerBrightness, spinerContrast;
 	private JButton btnReset;
+	
+	private double brightness, contrast;
 
 	public LinearAdjustmentFrame(ImageFrame parent) {
 		super(parent);
 		setTitle("Linear Adjustment: " + parent.getTitle());
 
+		brightness = parent.image.brightness();
+		contrast = parent.image.contrast();
+		
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
-		sliderBrightness = new JSlider(JSlider.HORIZONTAL, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0);
-		sliderBrightness.setBorder(BorderFactory.createTitledBorder("Brightness"));
-		panel.add(sliderBrightness);
+		spinnerBrightness = new JSpinner(new SpinnerNumberModel(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 1));
+		spinnerBrightness.setBorder(BorderFactory.createTitledBorder("Brightness"));
+		panel.add(spinnerBrightness);
 		
-		sliderContrast = new JSlider(JSlider.HORIZONTAL, MIN_CONTRAST, MAX_CONTRAST, 0);
-		sliderContrast.setBorder(BorderFactory.createTitledBorder("Contrast"));
-		panel.add(sliderContrast);
+		spinerContrast = new JSpinner(new SpinnerNumberModel(contrast, MIN_CONTRAST, MAX_CONTRAST, 1));
+		spinerContrast.setBorder(BorderFactory.createTitledBorder("Contrast"));
+		panel.add(spinerContrast);
 
 		btnReset = new JButton("Reset");
 		getContentPane().add(panel, BorderLayout.CENTER);
 		getContentPane().add(btnReset, BorderLayout.SOUTH);
 
-		sliderBrightness.addChangeListener(new ChangeListener() {
+		spinnerBrightness.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
 				refreshBrCn();
 			}
 		});
 		
-		sliderContrast.addChangeListener(new ChangeListener() {
+		spinerContrast.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
 				refreshBrCn();
 			}
@@ -57,8 +63,8 @@ public class LinearAdjustmentFrame extends Frame {
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.resetImage();
-				sliderContrast.setValue(0);
-				sliderBrightness.setValue(0);
+				spinnerBrightness.setValue(brightness);
+				spinerContrast.setValue(contrast);
 			}
 		});
 		setMinimumSize(new Dimension(300, 50));
@@ -66,9 +72,9 @@ public class LinearAdjustmentFrame extends Frame {
 	}
 	
 	private void refreshBrCn() {
-		int contrast = sliderContrast.getValue();
-		int offset = sliderBrightness.getValue();
-		getParentFrame().image.adjustment(offset, contrast);
+		double contrast = (Double)spinerContrast.getValue();
+		double offset = (Double)spinnerBrightness.getValue();
+		getParentFrame().image.adjustment2(offset, contrast);
 		getParentFrame().getPanel().repaint();
 	}
 

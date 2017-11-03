@@ -22,7 +22,7 @@ public class PropertiesFrame extends Frame {
 		super(parent);
 		setLayout(new GridLayout(7, 1));
 		
-		BufferedImage image = parent.image.image();
+		BufferedImage image = parent.image.get();
 		
 		categFormat = new JLabel(parent.image.getFormat());
 		categFormat.setBorder(BorderFactory.createTitledBorder("Format"));

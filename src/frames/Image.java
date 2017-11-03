@@ -27,7 +27,7 @@ public class Image {
 	}
 	
 	public Dimension getImageDimension() {
-		return new Dimension(image().getWidth(), image().getHeight());
+		return new Dimension(get().getWidth(), get().getHeight());
 	}
 
 	public String getFileName() {
@@ -41,11 +41,11 @@ public class Image {
 	}
 
 	public String getResolution() {
-		return image().getWidth() + "x" + image().getHeight();
+		return get().getWidth() + "x" + get().getHeight();
 	}
 	
 	public BufferedImage getSubimage(int x, int y, int w, int h) {
-		return image().getSubimage(x, y, w, h);
+		return get().getSubimage(x, y, w, h);
 	}
 	
 	public BufferedImage toGrayScale() {
@@ -57,11 +57,11 @@ public class Image {
 	}
 	
 	public int getWidth() {
-		return image().getWidth();
+		return get().getWidth();
 	}
 	
 	public int getHeight() {
-		return image().getHeight();
+		return get().getHeight();
 	}
 	
 	public void brighten(int offset) {
@@ -106,6 +106,55 @@ public class Image {
 		}
 	}
 	
+	public void adjustment2(double brightness, double contrast) {
+		double A = contrast / ImageUtils.contrast(getOriginal());
+		double B = brightness - ImageUtils.brightness(getOriginal()) * A;
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				int[] rgb = ColorUtils.intToRGB(original.getRGB(col, row));
+				rgb[0] = ImageUtils.truncate((int) (rgb[0] * A + B));
+				rgb[1] = ImageUtils.truncate((int) (rgb[1] * A + B));
+				rgb[2] = ImageUtils.truncate((int) (rgb[2] * A + B));
+				image.setRGB(col, row, ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]));
+			}
+		}
+	}
+	
+	public double brightness() {
+		int sum = 0;
+		int total = image.getWidth() * image.getHeight();
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				sum += ImageUtils.brightness(image.getRGB(col, row));
+			}
+		}
+		return sum / total;
+	}
+	
+	public double contrast() {
+
+		int[] aux = new int[image.getWidth()*image.getHeight()];
+		int k = 0;
+		for (int row = 0; row < image.getHeight(); row++) {
+			for (int col = 0; col < image.getWidth(); col++) {
+				aux[k++] = ImageUtils.brightness(image.getRGB(col, row));
+			}
+		}
+		
+		double sum = 0.0, standardDeviation = 0.0;
+
+        for(int num : aux) {
+            sum += num;
+        }
+
+        double mean = sum/aux.length;
+
+        for(int num: aux) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+		return Math.sqrt(standardDeviation/aux.length);
+	}
+	
 	public boolean isGrayscale() {
 		int i = image.getType();
 		if(i == BufferedImage.TYPE_BYTE_GRAY)
@@ -120,7 +169,7 @@ public class Image {
 	}
 	
 	public BufferedImage linearTransform(List<FunctionSegment> f) {
-		BufferedImage aux = ImageUtils.copyImage(image());
+		BufferedImage aux = ImageUtils.copyImage(get());
 		for (int row = 0; row < aux.getHeight(); row++) {
 			for (int col = 0; col < aux.getWidth(); col++) {
 				int[] rgb = ColorUtils.intToRGB(aux.getRGB(col, row));
@@ -139,7 +188,7 @@ public class Image {
 	}
 	
 	public double shannonEntropy() {
-		double[] normalized = new LUT(image()).normalizedCount();
+		double[] normalized = new LUT(get()).normalizedCount();
 		double entropy = 0.0d;
 		for(int i = 0; i < normalized.length; i++)
 			entropy -= normalized[i] * log2(normalized[i]);
@@ -152,7 +201,7 @@ public class Image {
 		return Math.log(value) / Math.log(2);
 	}
 	
-	public BufferedImage image() { return image; }
+	public BufferedImage get() { return image; }
 	public String getPath() { return path; }
 	public void setImage(BufferedImage image) { this.image = image; }
 	public void setPath(String path) { this.path = path; }

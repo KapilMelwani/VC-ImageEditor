@@ -75,7 +75,7 @@ public class HistogramFrame extends Frame {
 					return;
 				Image desired = new Image(selectedFile.getAbsolutePath());
 				double[] sk = new LUT(getParentFrame().getImage()).cumulativeNormalizedCount();
-				double[] zk = new LUT(desired.image()).cumulativeNormalizedCount();
+				double[] zk = new LUT(desired.get()).cumulativeNormalizedCount();
 				double[] z = new double[sk.length];
 				int[] n = new int[sk.length];
 				int zki = 0, ski = 0, zi = 0, ni = 0;

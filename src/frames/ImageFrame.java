@@ -63,7 +63,7 @@ public class ImageFrame extends Frame {
 	}
 	
 	public BufferedImage getImage() {
-		return image.image();
+		return image.get();
 	}
 
 	public ImagePanel getPanel() {
@@ -108,7 +108,7 @@ public class ImageFrame extends Frame {
 	}
 
 	public String getFileSize() {
-		DataBuffer buff = image.image().getRaster().getDataBuffer();
+		DataBuffer buff = image.get().getRaster().getDataBuffer();
 		int bytes = buff.getSize() * DataBuffer.getDataTypeSize(buff.getDataType()) / 8;
 
 		if (bytes <= 0)
@@ -175,7 +175,7 @@ public class ImageFrame extends Frame {
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.drawImage(image.image(), 0, 0, getWidth(), getHeight(), this);
+			g.drawImage(image.get(), 0, 0, getWidth(), getHeight(), this);
 			if(start != null && end != null && roi) {
 				int width = start.x - end.x;
 				int height = start.y - end.y;

@@ -37,7 +37,7 @@ public class MousePixelListener implements MouseMotionListener {
 		int y = (int) (e.getY() * panel.getScale());
 		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(image.image().getRGB(x, y));
+		Color color = new Color(image.get().getRGB(x, y));
 		colorPanel.setColor(color);
 		label.setText(	"x = " + x +
 						", y = " + y +
@@ -55,7 +55,7 @@ public class MousePixelListener implements MouseMotionListener {
 		int y = (int) (e.getY() * panel.getScale());
 		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(image.image().getRGB(x, y));
+		Color color = new Color(image.get().getRGB(x, y));
 		colorPanel.setColor(color);
 		label.setText(	"<html>x = " + x +
 				", y = " + y +

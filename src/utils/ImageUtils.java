@@ -369,7 +369,7 @@ public class ImageUtils {
 	}
 
 	public static void createNewImageFrame(ImageFrame parent, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
-		ImageFrame frame = new ImageFrame(parent.image.image(), parent);
+		ImageFrame frame = new ImageFrame(parent.image.get(), parent);
 		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
 		frame.setVisible(true);
 	}

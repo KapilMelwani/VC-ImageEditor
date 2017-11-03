@@ -101,7 +101,7 @@ public class MainFrame extends JFrame {
 					File selectedFile = jfc.getSelectedFile();
 					System.out.println("Saving to " + selectedFile.getAbsolutePath());
 					try {
-						ImageIO.write(focusedFrame.image.image(), format, new File(selectedFile.getAbsolutePath() + "." + format));
+						ImageIO.write(focusedFrame.image.get(), format, new File(selectedFile.getAbsolutePath() + "." + format));
 					} catch (IOException e1) { e1.printStackTrace(); }
 				}
 
@@ -168,6 +168,7 @@ public class MainFrame extends JFrame {
 				if(focusedFrame == null)
 					return;
 				ImageUtils.launchFrame(new LinearAdjustmentFrame(focusedFrame));
+				//ImageUtils.launchFrame(new LinearAdjustmentSliderFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmLinearAdjust);
