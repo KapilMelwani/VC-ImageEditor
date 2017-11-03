@@ -1,5 +1,6 @@
 package utils;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import object.RGB;
@@ -46,6 +47,19 @@ public class ColorUtils {
 				if(!lut[i][j].isGrayscale())
 					return false;
 		return true;
+	}
+	
+	public static int[] intToRGB(int color) {
+		Color aux = new Color(color);
+		int[] rgba = new int[3];
+		rgba[0] = aux.getRed();
+		rgba[1] = aux.getGreen();
+		rgba[2] = aux.getBlue();
+		return rgba;
+	}
+
+	public static int rgbToInt(int red, int green, int blue) {
+		return new Color(red, green, blue).getRGB();
 	}
 	
 }

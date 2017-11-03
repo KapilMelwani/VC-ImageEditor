@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 
 import frames.MainFrame;
 
-public class Main {
+public class ImageEditor {
 	
 	/**
 	 * Launch the application.

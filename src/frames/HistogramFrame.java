@@ -32,10 +32,10 @@ public class HistogramFrame extends Frame {
 	private JLabel lbColorValue, lbCount;
 	private JButton btnSpecify, btnEqualize, btnEqualizeRGB;
 
-	public HistogramFrame(Frame parent) {
+	public HistogramFrame(ImageFrame parent) {
 		super(parent);
 		setTitle("Histogram: " + parent.getTitle());
-		setLut(new LUT(((ImageFrame) parent).getImage()));
+		setLut(new LUT(parent.getImage()));
 		setTabbedPane(new JTabbedPane(JTabbedPane.TOP));
 
 		setPanel1(new HistogramPanel());
@@ -80,7 +80,7 @@ public class HistogramFrame extends Frame {
 		setBtnEqualize(new JButton("Equalize"));
 		getBtnEqualize().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
+				BufferedImage aux = ImageUtils.copyImage(parent.getImage());
 				int[][] gray  = lut.getGrayMatrix();
 				int[] grayAcc = lut.cumulativeCount();
 				int[][] result = equalizeMatrix(grayAcc, gray);
@@ -94,7 +94,7 @@ public class HistogramFrame extends Frame {
 		setBtnEqualizeRGB(new JButton("Equalize RGB"));
 		getBtnEqualizeRGB().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BufferedImage aux = ImageUtils.copyImage(((ImageFrame)parent).getPanel().getImage());
+				BufferedImage aux = ImageUtils.copyImage(parent.getImage());
 				int[][] red  = lut.getRedMatrix();
 				int[][] green  = lut.getGreenMatrix();
 				int[][] blue  = lut.getBlueMatrix();
@@ -127,8 +127,6 @@ public class HistogramFrame extends Frame {
 		auxSub2.add(btnEqualizeRGB);
 		add(aux, BorderLayout.SOUTH);
 
-		setLocationByPlatform(true);
-		setResizable(false);
 		pack();
 	}
 	

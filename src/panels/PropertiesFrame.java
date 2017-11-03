@@ -4,7 +4,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -19,20 +18,19 @@ public class PropertiesFrame extends Frame {
 
 	private JLabel categFormat, categResolution, categRange, categBrightness, categContrast, categDynRange;
 
-	public PropertiesFrame(Frame parent) {
+	public PropertiesFrame(ImageFrame parent) {
 		super(parent);
 		setLayout(new GridLayout(6, 1));
 		
-		BufferedImage image = ((ImageFrame)parent).getPanel().getImage();
-		ImageFrame frame = (ImageFrame)parent;
+		BufferedImage image = parent.image.image();
 		
-		categFormat = new JLabel(frame.getFormat());
+		categFormat = new JLabel(parent.image.getFormat());
 		categFormat.setBorder(BorderFactory.createTitledBorder("Format"));
 		categFormat.setHorizontalAlignment(SwingConstants.CENTER);
 		categFormat.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		add(categFormat);
 
-		categResolution = new JLabel(frame.getResolution());
+		categResolution = new JLabel(parent.image.getResolution());
 		categResolution.setBorder(BorderFactory.createTitledBorder("Resolution"));
 		categResolution.setHorizontalAlignment(SwingConstants.CENTER);
 		categResolution.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));

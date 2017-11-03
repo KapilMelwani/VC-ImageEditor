@@ -3,12 +3,18 @@ package frames;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.text.DecimalFormat;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import object.MousePixelListener;
 import utils.ImageUtils;
@@ -17,50 +23,37 @@ import utils.ImageUtils;
 public class ImageFrame extends Frame {
 
 	private JLabel lbInfo;
-	private MousePixelListener mousePixelListener;
-
-	// OTHERS
-	private BufferedImage image;
-	private Dimension imageScaledDim;
 	private ImagePanel panel;
-	private String path;
+
+	public Image image;
+	//private BufferedImage image;
+	private Dimension imageScaledDim;
+	private MousePixelListener mousePixelListener;
 
 	public ImageFrame(String file) {
 		this(ImageUtils.readImage(file), null);
-		setPath(file);
-		setTitle(getFileName());
+		setTitle(image.getFileName());
 	}
 
-	public ImageFrame(BufferedImage image, Frame parent) {
+	public ImageFrame(BufferedImage image, ImageFrame parent) {
 		super(parent);
-		setImage(image);
-		setParent(parent);
-		setPanel(new ImagePanel(image));
+		
+		this.image = new Image(image);
+		
+		setPanel(this.new ImagePanel());
 		setLbInfo(new JLabel());
 		refreshImageInfo();
-		setImageScaledDim(ImageUtils.scaleImage(getImageDimension()));
-		if (parent != null) {
-			setPath(((ImageFrame)parent).path);
-			//setMousePixelListener(((ImageFrame)parent).getMousePixelListener());
-		}
+		setImageScaledDim(ImageUtils.scaleImage(this.image.getImageDimension()));
 
+		// AWT STUFF
 		add(getPanel(), BorderLayout.CENTER);
 		getPanel().setPreferredSize(getImageScaledDim());
 		add(getLbInfo(), BorderLayout.NORTH);
-		setResizable(false);
 		pack();
 	}
-
+	
 	public BufferedImage getImage() {
-		return image;
-	}
-
-	public void setImage(BufferedImage image) {
-		this.image = image;
-		if(getPanel() != null) {
-			getPanel().setImage(getImage());
-			getPanel().repaint();
-		}
+		return image.image();
 	}
 
 	public ImagePanel getPanel() {
@@ -79,14 +72,6 @@ public class ImageFrame extends Frame {
 		this.imageScaledDim = imageScaledDim;
 	}
 
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
 	public JLabel getLbInfo() {
 		return lbInfo;
 	}
@@ -95,42 +80,25 @@ public class ImageFrame extends Frame {
 		this.lbInfo = lbInfo;
 	}
 
-	/**
-	 * @return the mousePixelListener
-	 */
 	public MousePixelListener getMousePixelListener() {
 		return mousePixelListener;
 	}
 
-	/**
-	 * @param mousePixelListener the mousePixelListener to set
-	 */
 	public void setMousePixelListener(MousePixelListener mousePixelListener) {
 		this.mousePixelListener = mousePixelListener;
 	}
-
-	public Dimension getImageDimension() {
-		return new Dimension(getImage().getWidth(), getImage().getHeight());
-	}
-
-	public String getFileName() {
-		return ImageUtils.getNameFromPath(getPath());
-	}
-
-	public String getFormat() {
-		return ImageUtils.getExtFromName(getFileName());
-	}
-
-	public String getResolution() {
-		return getImage().getWidth() + "x" + getImage().getHeight();
+	
+	public void resetImage() {
+		this.image.reset();
+		getPanel().repaint();
 	}
 
 	public void refreshImageInfo() {
-		getLbInfo().setText(getResolution() + " pixels; " + getFileSize());
+		getLbInfo().setText(image.getResolution() + " pixels; " + getFileSize());
 	}
 
 	public String getFileSize() {
-		DataBuffer buff = getImage().getRaster().getDataBuffer();
+		DataBuffer buff = image.image().getRaster().getDataBuffer();
 		int bytes = buff.getSize() * DataBuffer.getDataTypeSize(buff.getDataType()) / 8;
 
 		if (bytes <= 0)
@@ -139,35 +107,96 @@ public class ImageFrame extends Frame {
 		int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
 		return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
-	
+
 	public void addMousePixelListener(MousePixelListener listener) {
 		setMousePixelListener(listener);
-		panel.addMouseMotionListener(listener);
+		getPanel().addMouseMotionListener(listener);
 	}
 
 	public class ImagePanel extends JPanel {
-		private BufferedImage image;
+		//private BufferedImage image;
+		private boolean drag;
+		private boolean roi;
+		
+		private Point start, end;
 
-		public ImagePanel(BufferedImage image) {
-			setImage(image);
+		public ImagePanel() {
+			//setImage(image);
+			addMouseListener(new MouseAdapter() {
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					start = e.getPoint();
+					drag = true;
+					repaint();
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					if(!drag || end == null || start == null)
+						return;
+					drag = false;
+					int width = start.x - end.x;
+					int height = start.y - end.y;
+					int x = Math.min(start.x, end.x);
+					int y = Math.min(start.y, end.y);
+					System.out.println("("+ x + ", " + y + ") --> W: " + width + ", H: " + height);
+					ImageFrame frame = ImageUtils.getImageFrame(e.getComponent());
+					ImageUtils.createNewImageFrame(image.getSubimage(x, y, Math.abs(width), Math.abs(height)), frame);
+					start = null;
+					end = null;
+					roi = false;
+					repaint();
+				}
+			});
+			
+			addMouseMotionListener(new MouseMotionAdapter() {
+
+				@Override
+				public void mouseDragged(MouseEvent e) {
+					if(drag) {
+						if(e.getX() < 0 || e.getY() < 0 || e.getX() > getWidth() || e.getY() > getHeight())
+							return;
+						end = e.getPoint();
+						repaint();
+					}
+				}
+			});
 		}
 
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.drawImage(getImage(), 0, 0, getWidth(), getHeight(), this);
+			g.drawImage(image.image(), 0, 0, getWidth(), getHeight(), this);
+			if(start != null && end != null && roi) {
+				int width = start.x - end.x;
+				int height = start.y - end.y;
+				int x = Math.min(start.x, end.x);
+				int y = Math.min(start.y, end.y);
+				g.drawRect(x, y, Math.abs(width), Math.abs(height));
+				
+			}
 		}
-
+/*
 		public BufferedImage getImage() {
 			return image;
 		}
-
-		public void setImage(BufferedImage image) {
-			this.image = image;
-		}
-
+*/
 		public double getScale() {
 			return (double) ((double) image.getWidth() / (double) getWidth());
+		}
+
+		public boolean isDrag() {
+			return drag;
+		}
+		public void setDrag(boolean drag) {
+			this.drag = drag;
+		}
+		public boolean isROI() {
+			return roi;
+		}
+		public void setROI(boolean roi) {
+			this.roi = roi;
 		}
 	}
 

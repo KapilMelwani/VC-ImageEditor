@@ -1,6 +1,7 @@
 package utils;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -19,7 +20,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
@@ -90,39 +93,6 @@ public class ImageUtils {
 		}
 	}
 
-	/**
-	 * [0] = RED [1] = GREEN [2] = BLUE
-	 * 
-	 * @param color
-	 * @return
-	 */
-	public static int[] intToRGB(int color) {
-		Color aux = new Color(color);
-		int[] rgba = new int[3];
-		rgba[0] = aux.getRed();
-		rgba[1] = aux.getGreen();
-		rgba[2] = aux.getBlue();
-		return rgba;
-	}
-	
-	/**
-	 * [0] = RED [1] = GREEN [2] = BLUE [3] = ALPHA
-	 * 
-	 * @param color
-	 * @return
-	 */
-	public static int[] grayToRGB(int gray) {
-		int[] rgb = new int[3];
-		rgb[0] = (int) (gray / NTSC_RED);
-		rgb[1] = (int) (gray / NTSC_GREEN);
-		rgb[2] = (int) (gray / NTSC_BLUE);
-		return rgb;
-	}
-
-	public static int rgbToInt(int red, int green, int blue) {
-		return new Color(red, green, blue).getRGB();
-	}
-
 	public static void rgbToGrayscale(BufferedImage image) {
 		for (int i = 0; i < image.getWidth(); i++)
 			for (int j = 0; j < image.getHeight(); j++) {
@@ -136,7 +106,7 @@ public class ImageUtils {
 	}
 	
 	public static BufferedImage rgbToGrayscaleCopy(BufferedImage original) {
-		BufferedImage image = deepCopy(original);
+		BufferedImage image = copyImage(original);
 		for (int i = 0; i < image.getWidth(); i++)
 			for (int j = 0; j < image.getHeight(); j++) {
 				Color color = new Color(image.getRGB(i, j));
@@ -170,7 +140,7 @@ public class ImageUtils {
 		BufferedImage image = rgbToGrayscaleCopyAuto(original);
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
-				int value = ImageUtils.intToRGB(image.getRGB(col, row))[0];
+				int value = ColorUtils.intToRGB(image.getRGB(col, row))[0];
 				for (FunctionSegment segment : f) {
 					if (segment.getP1().getX() <= value) {
 						value = ImageUtils.truncate((int) segment.f(value));
@@ -178,7 +148,7 @@ public class ImageUtils {
 					}
 				}
 				
-				image.setRGB(col, row, ImageUtils.rgbToInt(value, value, value));
+				image.setRGB(col, row, ColorUtils.rgbToInt(value, value, value));
 			}
 		}
 		return image;
@@ -312,7 +282,7 @@ public class ImageUtils {
 	}
 
 	public static int brightness(int color) {
-		int[] c = ImageUtils.intToRGB(color);
+		int[] c = ColorUtils.intToRGB(color);
 		int r = (int) (Math.pow(c[0], 2) * NTSC_RED);
 		int g = (int) (Math.pow(c[1], 2) * NTSC_GREEN);
 		int b = (int) (Math.pow(c[2], 2) * NTSC_BLUE);
@@ -320,29 +290,29 @@ public class ImageUtils {
 	}
 	
 	public static int gamma(int color, double gamma) {
-		int[] rgb = ImageUtils.intToRGB(color);
+		int[] rgb = ColorUtils.intToRGB(color);
 		double gammaCorrection = 1 / gamma;
 		int r = (int) (255 * Math.pow((double)(rgb[0] / 255d), gammaCorrection));
 		int g = (int) (255 * Math.pow((double)(rgb[1] / 255d), gammaCorrection));
 		int b = (int) (255 * Math.pow((double)(rgb[2] / 255d), gammaCorrection));
-		return ImageUtils.rgbToInt(r, g, b);
+		return ColorUtils.rgbToInt(r, g, b);
 	}
 	
 	public static int brighten(int color, int offset) {
-		int[] rgb = ImageUtils.intToRGB(color);
+		int[] rgb = ColorUtils.intToRGB(color);
 		rgb[0] = truncate(rgb[0] + offset);
 		rgb[1] = truncate(rgb[1] + offset);
 		rgb[2] = truncate(rgb[2] + offset);
-		return ImageUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
+		return ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
 	}
 
 	public static int contrast(int color, float contrast) {
 		float factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-		int[] rgb = ImageUtils.intToRGB(color);
+		int[] rgb = ColorUtils.intToRGB(color);
 		rgb[0] = (int) truncate(factor * (rgb[0] - 128) + 128);
 		rgb[1] = (int) truncate(factor * (rgb[1] - 128) + 128);
 		rgb[2] = (int) truncate(factor * (rgb[2] - 128) + 128);
-		return ImageUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
+		return ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]);
 	}
 
 	public static int truncate(int value) {
@@ -376,7 +346,7 @@ public class ImageUtils {
 			}
 		return new AbstractMap.SimpleEntry<Integer, Integer>(min, max);
 	}
-
+/*
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
 			PixelColorPanel pnMousePixelColor) {
 		ImageFrame frame = new ImageFrame(image, parent);
@@ -384,24 +354,40 @@ public class ImageUtils {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
-
+*/
+	public static void createNewImageFrame(String file, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
+		ImageFrame frame = new ImageFrame(file);
+		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+		ImageUtils.launchFrame(frame);
+	}
+	
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent) {
-		ImageFrame frame = new ImageFrame(image, parent);
 		MousePixelListener aux = parent.getMousePixelListener();
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+		ImageFrame frame = new ImageFrame(image, parent);
+		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
+		launchFrame(frame);
 	}
 
 	public static void createNewImageFrame(ImageFrame parent, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
-		ImageFrame frame = new ImageFrame(parent.getImage(), parent);
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
+		ImageFrame frame = new ImageFrame(parent.image.image(), parent);
+		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
 		frame.setVisible(true);
 	}
 	
-	public static void launchFrame(Frame parent) {
-		Frame frame = new Frame(parent);
+	public static void launchFrame(Frame frame) {
+		frame.setResizable(false);
 		frame.setVisible(true);
+	}
+	
+	public static BufferedImage subImage(BufferedImage image, int x, int y, int w, int h) {
+		return image.getSubimage(x, y, w, h);
+	}
+	
+	public static ImageFrame getImageFrame(Component c) {
+		JFrame frame = (JFrame) SwingUtilities.getRoot(c);
+		if(frame instanceof ImageFrame)
+			return (ImageFrame)frame;
+		return null;
 	}
 
 }

@@ -6,8 +6,11 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 
+import frames.Image;
+import frames.ImageFrame;
 import frames.ImageFrame.ImagePanel;
 import panels.PixelColorPanel;
+import utils.ImageUtils;
 
 public class MousePixelListener implements MouseMotionListener {
 
@@ -18,15 +21,23 @@ public class MousePixelListener implements MouseMotionListener {
 		setLabel(label);
 		setColorPanel(colorPanel);
 	}
+	
+	public MousePixelListener(MousePixelListener mousePixelListener) {
+		setLabel(mousePixelListener.getLabel());
+		setColorPanel(mousePixelListener.getColorPanel());
+	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		ImagePanel aux = (ImagePanel)e.getComponent();
-		int x = (int) (e.getX() * aux.getScale());
-		int y = (int) (e.getY() * aux.getScale());
-		if(x > aux.getImage().getWidth() || x < 0 || y > aux.getImage().getHeight() || y < 0)
+		ImageFrame frame = ImageUtils.getImageFrame(e.getComponent());
+		ImagePanel panel = frame.getPanel();
+		Image image = frame.image;
+		
+		int x = (int) (e.getX() * panel.getScale());
+		int y = (int) (e.getY() * panel.getScale());
+		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(aux.getImage().getRGB(x, y));
+		Color color = new Color(image.image().getRGB(x, y));
 		colorPanel.setColor(color);
 		label.setText(	"x = " + x +
 						", y = " + y +
@@ -36,12 +47,15 @@ public class MousePixelListener implements MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		ImagePanel aux = (ImagePanel)e.getComponent();
-		int x = (int) (e.getX() * aux.getScale());
-		int y = (int) (e.getY() * aux.getScale());
-		if(x > aux.getImage().getWidth() || x < 0 || y > aux.getImage().getHeight() || y < 0)
+		ImageFrame frame = ImageUtils.getImageFrame(e.getComponent());
+		ImagePanel panel = frame.getPanel();
+		Image image = frame.image;
+		
+		int x = (int) (e.getX() * panel.getScale());
+		int y = (int) (e.getY() * panel.getScale());
+		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(aux.getImage().getRGB(x, y));
+		Color color = new Color(image.image().getRGB(x, y));
 		colorPanel.setColor(color);
 		label.setText(	"<html>x = " + x +
 				", y = " + y +

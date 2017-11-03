@@ -29,10 +29,9 @@ public class GammaCorrectionFrame extends Frame {
 	private JButton btnReset;
 	private BufferedImage image;
 
-	public GammaCorrectionFrame(Frame parent) {
+	public GammaCorrectionFrame(ImageFrame parent) {
 		super(parent);
-		setTitle("Gamma Correction: " + parent.getTitle());
-		setResizable(false);
+		super.setTitle("Gamma Correction: " + parent.getTitle());
 
 		image = ImageUtils.copyImage(((ImageFrame) parent).getImage());
 
@@ -54,14 +53,13 @@ public class GammaCorrectionFrame extends Frame {
 			public void stateChanged(ChangeEvent evt) {
 				double gamma = getSliderGamma().getValue()/100d;
 				gamma(gamma);
-				((ImageFrame) parent).getPanel().repaint();
+				parent.getPanel().repaint();
 			}
 		});
 
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				((ImageFrame) parent).setImage(ImageUtils.deepCopy(image));
-				((ImageFrame) parent).getPanel().repaint();
+				parent.resetImage();
 				getSliderGamma().setValue(100);
 			}
 		});
@@ -72,7 +70,7 @@ public class GammaCorrectionFrame extends Frame {
 	private void gamma(double gamma) {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++) {
-				BufferedImage aux = ((ImageFrame) parent).getPanel().getImage();
+				BufferedImage aux = parent.getImage();
 				aux.setRGB(col, row, ImageUtils.gamma(image.getRGB(col, row), gamma));
 			}
 	}

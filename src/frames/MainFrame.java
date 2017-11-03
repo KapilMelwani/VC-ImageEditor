@@ -2,6 +2,7 @@ package frames;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,8 +10,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-import object.MousePixelListener;
 import panels.PixelColorPanel;
+import panels.PropertiesFrame;
 import utils.ImageUtils;
 
 import java.awt.GridLayout;
@@ -22,11 +23,12 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -52,6 +54,8 @@ public class MainFrame extends JFrame {
 	private ImageFrame focusedFrame;
 	private JMenu mnEdit, mntmColor, mnOrignal;
 	//private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
+	
+	public static List<Frame> frames = new ArrayList<Frame>();
 
 	/**
 	 * Create the frame.
@@ -75,7 +79,7 @@ public class MainFrame extends JFrame {
 				if(selectedFile == null)
 					return;
 				System.out.println("Opening " + selectedFile.getAbsolutePath());
-				createNewImageFrame(selectedFile.getAbsolutePath());
+				ImageUtils.createNewImageFrame(selectedFile.getAbsolutePath(), lbCursorInfo, pnMousePixelColor);
 
 			}
 		});
@@ -87,7 +91,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				String format = focusedFrame.getFormat();
+				String format = focusedFrame.image.getFormat();
 				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(format + " images", format);
 				jfc.setAcceptAllFileFilterUsed(false);
@@ -97,7 +101,7 @@ public class MainFrame extends JFrame {
 					File selectedFile = jfc.getSelectedFile();
 					System.out.println("Saving to " + selectedFile.getAbsolutePath());
 					try {
-						ImageIO.write(focusedFrame.getImage(), format, new File(selectedFile.getAbsolutePath() + "." + format));
+						ImageIO.write(focusedFrame.image.image(), format, new File(selectedFile.getAbsolutePath() + "." + format));
 					} catch (IOException e1) { e1.printStackTrace(); }
 				}
 
@@ -131,7 +135,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.createNewImageFrame(ImageUtils.rgbToGrayscaleCopyAuto(focusedFrame.getImage()), focusedFrame);
+				ImageUtils.createNewImageFrame(focusedFrame.image.toGrayScale(), focusedFrame);
 			}
 		});
 	    mntmColor.add(mntmToGrayscale);
@@ -143,7 +147,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchFrame(focusedFrame);
+				ImageUtils.launchFrame(new HistogramFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmHistogram);
@@ -153,7 +157,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchFrame(focusedFrame);
+				ImageUtils.launchFrame(new LinearTranformationFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmLinearTrans);
@@ -163,7 +167,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchFrame(focusedFrame);
+				ImageUtils.launchFrame(new LinearAdjustmentFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmLinearAdjust);
@@ -173,7 +177,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchFrame(focusedFrame);
+				ImageUtils.launchFrame(new GammaCorrectionFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmGammaCorrect);
@@ -183,7 +187,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				ImageUtils.launchFrame(focusedFrame);
+				ImageUtils.launchFrame(new PropertiesFrame(focusedFrame));
 			}
 		});	    
 		mnEdit.add(mntmProperties);
@@ -215,33 +219,30 @@ public class MainFrame extends JFrame {
 		JButton btnImage = new JButton("Image");
 		btnImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				createNewImageFrame("/Users/peter/Drive/VC/lena.png");
+				ImageUtils.createNewImageFrame("/Users/peter/Drive/VC/lena.png", lbCursorInfo, pnMousePixelColor);
 			}
 		});
+		
+		JButton btnCrop = new JButton("Crop");
+		btnCrop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((ImageFrame)focusedFrame).getPanel().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+				((ImageFrame)focusedFrame).getPanel().setROI(true);
+			}
+		});
+		JPanel pnButtons = new JPanel(new GridLayout(1, 2));
+		pnButtons.add(btnCrop);
+		pnButtons.add(btnImage);
 		
 		JPanel aux = new JPanel(new GridLayout(1, 2));
 		pnMousePixelColor = new PixelColorPanel();
 		aux.add(pnMousePixelColor);
-		aux.add(btnImage);
+		aux.add(pnButtons);
 		pnInfo.add(aux);
 		pack();
-		setSize(getWidth() * 2, getHeight());
+		//setSize(getWidth() * 2, getHeight());
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new FocusChangeListener());
 
-	}
-	
-	public void createNewImageFrame(String file) {
-		ImageFrame frame = new ImageFrame(file);
-		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-	}
-	
-	public void createNewImageFrame(BufferedImage image, ImageFrame parent) {
-		ImageFrame frame = new ImageFrame(image, parent);
-		//frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
 	}
 
 	class FocusChangeListener implements PropertyChangeListener {
