@@ -101,6 +101,18 @@ public class RGB {
 		this.blue = blue;
 	}
 	
+	public RGB sum(RGB other) {
+		return new RGB(getRed() + other.getRed(), getGreen() + other.getGreen(), getBlue() + other.getBlue());
+	}
+	
+	public RGB difference(RGB other) {
+		return new RGB(getRed() - other.getRed(), getGreen() - other.getGreen(), getBlue() - other.getBlue());
+	}
+	
+	public RGB absDifference(RGB other) {
+		return new RGB(Math.abs(getRed() - other.getRed()), Math.abs(getGreen() - other.getGreen()), Math.abs(getBlue() - other.getBlue()));
+	}
+	
 	public static int toInt(int red, int green, int blue) {
 		int rgb = red;
 		rgb = rgb << 8;

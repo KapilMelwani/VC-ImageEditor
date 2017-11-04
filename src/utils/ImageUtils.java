@@ -27,6 +27,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import frames.Frame;
+import frames.Image;
 import frames.ImageFrame;
 import object.FunctionSegment;
 import object.LUT;
@@ -364,6 +365,13 @@ public class ImageUtils {
 	public static void createNewImageFrame(BufferedImage image, ImageFrame parent) {
 		MousePixelListener aux = parent.getMousePixelListener();
 		ImageFrame frame = new ImageFrame(image, parent);
+		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
+		launchFrame(frame);
+	}
+	
+	public static void createNewImageFrame(Image image, ImageFrame parent) {
+		MousePixelListener aux = parent.getMousePixelListener();
+		ImageFrame frame = new ImageFrame(image.get(), parent);
 		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
 		launchFrame(frame);
 	}

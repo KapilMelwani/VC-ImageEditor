@@ -15,6 +15,12 @@ public class LUT {
 		setGrayscale();
 	}
 	
+	public LUT(RGB[] lut) {
+		setLut(new RGB[1][lut.length]);
+		this.lut[0] = lut;
+		setGrayscale();
+	}
+	
 	public LUT(LUT lut) {
 		this(lut.getLut());
 	}

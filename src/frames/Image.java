@@ -6,6 +6,7 @@ import java.util.List;
 
 import object.FunctionSegment;
 import object.LUT;
+import object.RGB;
 import utils.ColorUtils;
 import utils.ImageUtils;
 
@@ -185,6 +186,39 @@ public class Image {
 			}
 		}
 		return aux;
+	}
+	
+	public Image difference(Image newImage) {
+		if(!this.getResolution().equals(newImage.getResolution()))
+			return null;
+		BufferedImage result = ImageUtils.copyImage(newImage.get());
+		for (int row = 0; row < result.getHeight(); row++) {
+			for (int col = 0; col < result.getWidth(); col++) {
+				RGB color = get(col, row).absDifference(newImage.get(col, row));
+				result.setRGB(col, row, color.toInt());
+			}
+		}
+		Image aux = new Image(result);
+		aux.setPath(getPath());
+		return aux;
+	}
+	
+	public BufferedImage difference(BufferedImage newImage) {
+		if(getWidth() != newImage.getWidth() || getHeight() != newImage.getHeight())
+			return null;
+		BufferedImage result = ImageUtils.copyImage(newImage);
+		for (int row = 0; row < result.getHeight(); row++) {
+			for (int col = 0; col < result.getWidth(); col++) {
+				RGB a = new RGB(newImage.getRGB(col, row));
+				RGB color = get(col, row).absDifference(a);
+				result.setRGB(col, row, color.toInt());
+			}
+		}
+		return result;
+	}
+	
+	public RGB get(int x, int y) {
+		return new RGB(get().getRGB(x, y));
 	}
 	
 	public double shannonEntropy() {

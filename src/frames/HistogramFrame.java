@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import object.LUT;
 import object.MouseHistogramListener;
+import object.RGB;
 import panels.HistogramPanel;
 import utils.ImageUtils;
 
@@ -32,6 +33,52 @@ public class HistogramFrame extends Frame {
 	private JLabel lbColorValue, lbCount;
 	private JButton btnSpecify, btnEqualize, btnEqualizeRGB;
 
+	public HistogramFrame(RGB[] pixels, ImageFrame parent) {
+		super(parent);
+		setTitle("Histogram: (Cross Section) " + parent.getTitle());
+		setLut(new LUT(pixels));
+		setTabbedPane(new JTabbedPane(JTabbedPane.TOP));
+
+		setPanel1(new HistogramPanel());
+		setPanel2(new HistogramPanel());
+		setPanel3(new HistogramPanel());
+
+		if (!lut.isGrayscale()) {
+			getPanel1().newHistogramLayer(lut.redCount(), Color.RED, false, "Red");
+			getPanel1().newHistogramLayer(lut.greenCount(), Color.GREEN, false, "Green");
+			getPanel1().newHistogramLayer(lut.blueCount(), Color.BLUE, false, "Blue");
+		}
+
+		getPanel1().newHistogramLayer(lut.grayCount(), Color.DARK_GRAY, true, "Gray");
+		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.MAGENTA, true, "Cumulative");
+
+		getTabbedPane().addTab("Color", getPanel1());
+		getTabbedPane().addTab("Cumulative", getPanel2());
+		getTabbedPane().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				//System.out.println("Tab: " + tabbedPane.getSelectedIndex());
+				pack();
+			}
+		});
+		add(getTabbedPane(), BorderLayout.CENTER);
+
+		setLbColorValue(new JLabel("0", SwingConstants.CENTER));
+		getLbColorValue().setBorder(BorderFactory.createTitledBorder("Color Value"));
+
+		setLbCount(new JLabel("0", SwingConstants.CENTER));
+		getLbCount().setBorder(BorderFactory.createTitledBorder("Ocurrences"));
+
+		getPanel1().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
+		getPanel2().addMouseMotionListener(new MouseHistogramListener(getLbColorValue(), getLbCount()));
+
+		JPanel aux = new JPanel(new GridLayout(1, 2));
+		aux.add(lbColorValue);
+		aux.add(lbCount);
+		
+		add(aux, BorderLayout.SOUTH);
+		pack();
+	}
+	
 	public HistogramFrame(ImageFrame parent) {
 		super(parent);
 		setTitle("Histogram: " + parent.getTitle());

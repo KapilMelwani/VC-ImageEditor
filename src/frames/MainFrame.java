@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal, mntmProperties;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal, mntmProperties, mntmDifference;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -193,6 +193,20 @@ public class MainFrame extends JFrame {
 		});	    
 		mnEdit.add(mntmProperties);
 		
+		mntmDifference = new JMenuItem("Difference");
+		mntmDifference.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				File selectedFile = ImageUtils.openImage();
+				if(selectedFile == null)
+					return;
+				Image image = ((ImageFrame)focusedFrame).image.difference(new Image(selectedFile.getAbsolutePath()));
+				ImageUtils.createNewImageFrame(image, focusedFrame);
+			}
+		});	    
+		mnEdit.add(mntmDifference);
+		
 		mnOrignal = new JMenu("Original");
 		menuBar.add(mnOrignal);
 		
@@ -224,15 +238,25 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		JButton btnCrop = new JButton("Crop");
-		btnCrop.addActionListener(new ActionListener() {
+		JButton btnROI = new JButton("ROI");
+		btnROI.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				((ImageFrame)focusedFrame).getPanel().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 				((ImageFrame)focusedFrame).getPanel().setROI(true);
 			}
 		});
+		
+		JButton btnCrossSection = new JButton("CS");
+		btnCrossSection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((ImageFrame)focusedFrame).getPanel().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+				((ImageFrame)focusedFrame).getPanel().setCS(true);
+			}
+		});
+		
 		JPanel pnButtons = new JPanel(new GridLayout(1, 2));
-		pnButtons.add(btnCrop);
+		pnButtons.add(btnROI);
+		pnButtons.add(btnCrossSection);
 		pnButtons.add(btnImage);
 		
 		JPanel aux = new JPanel(new GridLayout(1, 2));
