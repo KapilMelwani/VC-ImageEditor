@@ -11,8 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -20,27 +19,27 @@ import javax.swing.event.ChangeListener;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")
-public class GammaCorrectionFrame extends Frame {
+public class GammaCorrectionSliderFrame extends Frame {
 	
-	public final static double MIN_GAMMA = 0.01;
-	public final static double MAX_GAMMA = 19.99;
+	public final static int MIN_GAMMA = 1;
+	public final static int MAX_GAMMA = 799;
 
-	private JSpinner spinnerGamma;
+	private JSlider sliderGamma;
 	private JLabel lbFormula;
 	private JButton btnReset;
 	private BufferedImage image;
 
-	public GammaCorrectionFrame(ImageFrame parent) {
+	public GammaCorrectionSliderFrame(ImageFrame parent) {
 		super(parent);
 		super.setTitle("Gamma Correction: " + parent.getTitle());
 
-		image = ImageUtils.copyImage(parent.getImage());
+		image = ImageUtils.copyImage(((ImageFrame) parent).getImage());
 
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
-		setSpinnerGamma(new JSpinner(new SpinnerNumberModel(1.00, MIN_GAMMA, MAX_GAMMA, 0.01)));
-		getSpinnerGamma().setBorder(BorderFactory.createTitledBorder("Gamma Correction"));
-		panel.add(getSpinnerGamma());
+		setSliderGamma(new JSlider(JSlider.HORIZONTAL, MIN_GAMMA, MAX_GAMMA, 100));
+		getSliderGamma().setBorder(BorderFactory.createTitledBorder("Gamma Correction"));
+		panel.add(getSliderGamma());
 		
 		setLbFormula(new JLabel("<html>I' = 255 x (<sup>I </sup>&frasl;<sub> 255</sub>)<sup><sup>1 </sup>&frasl;<sub> &gamma</sub></sup></html>", SwingConstants.CENTER));
 		getLbFormula().setBorder(BorderFactory.createTitledBorder(""));
@@ -50,9 +49,9 @@ public class GammaCorrectionFrame extends Frame {
 		getContentPane().add(panel, BorderLayout.CENTER);
 		getContentPane().add(getBtnReset(), BorderLayout.SOUTH);
 
-		getSpinnerGamma().addChangeListener(new ChangeListener() {
+		getSliderGamma().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
-				double gamma = (Double)getSpinnerGamma().getValue();
+				double gamma = getSliderGamma().getValue()/100d;
 				gamma(gamma);
 				parent.getPanel().repaint();
 			}
@@ -61,7 +60,7 @@ public class GammaCorrectionFrame extends Frame {
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.resetImage();
-				getSpinnerGamma().setValue(100);
+				getSliderGamma().setValue(100);
 			}
 		});
 		setMinimumSize(new Dimension(300, 50));
@@ -76,24 +75,46 @@ public class GammaCorrectionFrame extends Frame {
 			}
 	}
 
+	/**
+	 * @return the sliderGamma
+	 */
+	public JSlider getSliderGamma() {
+		return sliderGamma;
+	}
+
+	/**
+	 * @return the lbFormula
+	 */
 	public JLabel getLbFormula() {
 		return lbFormula;
 	}
 
+	/**
+	 * @return the btnReset
+	 */
 	public JButton getBtnReset() {
 		return btnReset;
 	}
 
-	public void setLbFormula(JLabel lbFormula) { this.lbFormula = lbFormula; }
-
-	public void setBtnReset(JButton btnReset) { this.btnReset = btnReset; }
-
-	public JSpinner getSpinnerGamma() {
-		return spinnerGamma;
+	/**
+	 * @param sliderGamma the sliderGamma to set
+	 */
+	public void setSliderGamma(JSlider sliderGamma) {
+		this.sliderGamma = sliderGamma;
 	}
 
-	public void setSpinnerGamma(JSpinner spinnerGamma) {
-		this.spinnerGamma = spinnerGamma;
+	/**
+	 * @param lbFormula the lbFormula to set
+	 */
+	public void setLbFormula(JLabel lbFormula) {
+		this.lbFormula = lbFormula;
+	}
+
+	/**
+	 * @param btnReset the btnReset to set
+	 */
+	public void setBtnReset(JButton btnReset) {
+		this.btnReset = btnReset;
 	}
 
 }
