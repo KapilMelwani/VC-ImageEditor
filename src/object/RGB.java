@@ -113,6 +113,21 @@ public class RGB {
 		return new RGB(Math.abs(getRed() - other.getRed()), Math.abs(getGreen() - other.getGreen()), Math.abs(getBlue() - other.getBlue()));
 	}
 	
+	public static RGB average(RGB[][] values) {
+		if(values.length == 0 || values == null)
+			return null;
+		int sumRed = 0, sumGreen = 0, sumBlue = 0;
+		int total = values.length * values[0].length;
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < values[i].length; j++) {
+				sumRed += values[i][j].getRed();
+				sumGreen += values[i][j].getGreen();
+				sumBlue += values[i][j].getBlue();
+			}
+		}
+		return new RGB(sumRed/total, sumGreen/total, sumBlue/total);
+	}
+	
 	public static int toInt(int red, int green, int blue) {
 		int rgb = red;
 		rgb = rgb << 8;

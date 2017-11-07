@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
 	// JMENU
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal, mntmProperties, mntmDifference;
+	private JMenuItem mntmOpen, mntmSave, mntmExit, mntmToGrayscale, mntmHistogram, mntmLinearTrans, mntmLinearAdjust, mntmGammaCorrect, mntmShowOriginal, mntmProperties, mntmDifference, mntmDigitalization;
 	
 	// OTHERS
 	private JPanel contentPane;
@@ -206,6 +206,16 @@ public class MainFrame extends JFrame {
 			}
 		});	    
 		mnEdit.add(mntmDifference);
+		
+		mntmDigitalization = new JMenuItem("Simulate Digitalization");
+		mntmDigitalization.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(focusedFrame == null)
+					return;
+				ImageUtils.launchFrame(new DigitalizationFrame(focusedFrame));
+			}
+		});	    
+		mnEdit.add(mntmDigitalization);
 		
 		mnOrignal = new JMenu("Original");
 		menuBar.add(mnOrignal);

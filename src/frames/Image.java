@@ -235,6 +235,27 @@ public class Image {
 		return Math.log(value) / Math.log(2);
 	}
 	
+	public BufferedImage downsample(int sampleSize) {
+		BufferedImage aux = ImageUtils.copyImage(getOriginal());
+		for (int row = 0; row < aux.getHeight(); row += sampleSize) {
+			for (int col = 0; col < aux.getWidth(); col += sampleSize) {
+				RGB[][] sample = new RGB[sampleSize][sampleSize];
+				for (int i = 0; i < sampleSize; i++) {
+					for (int j = 0; j < sampleSize; j++) {
+						sample[i][j] = new RGB(aux.getRGB(row, col));
+					}
+				}
+				RGB average = RGB.average(sample);
+				for (int i = col; i < col+sampleSize; i++) {
+					for (int j = row; j < row+sampleSize; j++) {
+						get().setRGB(j, i, average.toInt());
+					}
+				}
+			}
+		}
+		return aux;
+	}
+	
 	public BufferedImage get() { return image; }
 	public String getPath() { return path; }
 	public void setImage(BufferedImage image) { this.image = image; }
