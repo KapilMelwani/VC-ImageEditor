@@ -1,6 +1,7 @@
 package frames;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +46,8 @@ public class DigitalizationFrame extends Frame {
 		
 		getColorSpinner().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
+				getParentFrame().image.changeColorDepth2((Integer) getColorSpinner().getValue());
+				getParentFrame().getPanel().repaint();
 			}
 		});
 		
@@ -55,6 +58,7 @@ public class DigitalizationFrame extends Frame {
 				getColorSpinner().setValue(8);
 			}
 		});
+		setPreferredSize(new Dimension(300,100));
 		pack();
 	}
 

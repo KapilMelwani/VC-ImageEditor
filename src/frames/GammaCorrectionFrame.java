@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,24 +16,19 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import utils.ImageUtils;
-
 @SuppressWarnings("serial")
 public class GammaCorrectionFrame extends Frame {
 	
 	public final static double MIN_GAMMA = 0.01;
-	public final static double MAX_GAMMA = 19.99;
+	public final static double MAX_GAMMA = 40.00;
 
 	private JSpinner spinnerGamma;
 	private JLabel lbFormula;
 	private JButton btnReset;
-	private BufferedImage image;
 
 	public GammaCorrectionFrame(ImageFrame parent) {
 		super(parent);
 		super.setTitle("Gamma Correction: " + parent.getTitle());
-
-		image = ImageUtils.copyImage(parent.getImage());
 
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
@@ -53,7 +47,7 @@ public class GammaCorrectionFrame extends Frame {
 		getSpinnerGamma().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
 				double gamma = (Double)getSpinnerGamma().getValue();
-				gamma(gamma);
+				getParentFrame().image.gamma(gamma);
 				parent.getPanel().repaint();
 			}
 		});
@@ -67,7 +61,7 @@ public class GammaCorrectionFrame extends Frame {
 		setMinimumSize(new Dimension(300, 50));
 		pack();
 	}
-	
+	/*
 	private void gamma(double gamma) {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++) {
@@ -75,25 +69,12 @@ public class GammaCorrectionFrame extends Frame {
 				aux.setRGB(col, row, ImageUtils.gamma(image.getRGB(col, row), gamma));
 			}
 	}
-
-	public JLabel getLbFormula() {
-		return lbFormula;
-	}
-
-	public JButton getBtnReset() {
-		return btnReset;
-	}
-
+*/
+	public JLabel getLbFormula() { return lbFormula; }
+	public JButton getBtnReset() { return btnReset; }
 	public void setLbFormula(JLabel lbFormula) { this.lbFormula = lbFormula; }
-
 	public void setBtnReset(JButton btnReset) { this.btnReset = btnReset; }
-
-	public JSpinner getSpinnerGamma() {
-		return spinnerGamma;
-	}
-
-	public void setSpinnerGamma(JSpinner spinnerGamma) {
-		this.spinnerGamma = spinnerGamma;
-	}
+	public JSpinner getSpinnerGamma() { return spinnerGamma; }
+	public void setSpinnerGamma(JSpinner spinnerGamma) { this.spinnerGamma = spinnerGamma; }
 
 }

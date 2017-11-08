@@ -237,23 +237,65 @@ public class Image {
 	
 	public BufferedImage downsample(int sampleSize) {
 		BufferedImage aux = ImageUtils.copyImage(getOriginal());
+		
 		for (int row = 0; row < aux.getHeight(); row += sampleSize) {
 			for (int col = 0; col < aux.getWidth(); col += sampleSize) {
-				RGB[][] sample = new RGB[sampleSize][sampleSize];
-				for (int i = 0; i < sampleSize; i++) {
-					for (int j = 0; j < sampleSize; j++) {
-						sample[i][j] = new RGB(aux.getRGB(row, col));
+				RGB[][] sample = null;
+				int width = 0, height = 0;
+				if(row+sampleSize >= aux.getHeight())
+					width = Math.abs(sampleSize - (aux.getHeight() - row+sampleSize));
+				else
+					width = sampleSize;
+				if(col+sampleSize >= aux.getWidth())
+					height = Math.abs(sampleSize - (aux.getWidth() - col+sampleSize));
+				else
+					height = sampleSize;
+				int side = Math.min(width, height);
+				sample = new RGB[side][side];
+					
+				for (int i = 0; i < side; i++) {
+					for (int j = 0; j < side; j++) {
+						sample[i][j] = new RGB(aux.getRGB(col+i, row+j));
 					}
 				}
 				RGB average = RGB.average(sample);
-				for (int i = col; i < col+sampleSize; i++) {
-					for (int j = row; j < row+sampleSize; j++) {
-						get().setRGB(j, i, average.toInt());
+				for (int i = col; i < col+side; i++) {
+					for (int j = row; j < row+side; j++) {
+						get().setRGB(i, j, average.toInt());
 					}
 				}
 			}
 		}
 		return aux;
+	}
+	
+	public void changeColorDepth1(int bits) {
+		int n = 8 - bits;
+		for (int row = 0; row < get().getHeight(); row++) {
+			for (int col = 0; col < get().getWidth(); col++) {
+				RGB value = new RGB(getOriginal().getRGB(col, row));
+				RGB newColor = value.divide((int) Math.pow(2, n));
+				get().setRGB(col, row, newColor.toInt());
+			}
+		}
+	}
+	
+	public void changeColorDepth2(int bits) {
+		int length = 256 / bits;
+		for (int row = 0; row < get().getHeight(); row++) {
+			for (int col = 0; col < get().getWidth(); col++) {
+				RGB value = new RGB(getOriginal().getRGB(col, row));
+				RGB newColor = value.approx(length);
+				get().setRGB(col, row, newColor.toInt());
+			}
+		}
+	}
+	
+	public void gamma(double gamma) {
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++) {
+				get().setRGB(col, row, new RGB(get().getRGB(col, row)).gamma(gamma).toInt());
+			}
 	}
 	
 	public BufferedImage get() { return image; }

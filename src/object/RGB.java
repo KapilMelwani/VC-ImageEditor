@@ -40,13 +40,15 @@ public class RGB {
 	}
 	
 	public void gammaMod(double gamma) {
-		double gammaCorrection = 1 / gamma;
-		int r = (int) (255 * Math.pow(getRed() / 255, gammaCorrection));
-		int g = (int) (255 * Math.pow(getGreen() / 255, gammaCorrection));
-		int b = (int) (255 * Math.pow(getBlue() / 255, gammaCorrection));
-		setRed(r);
-		setGreen(g);
-		setBlue(b);
+		double aR = getRed() / 255;
+		double aG = getGreen() / 255;
+		double aB = getBlue() / 255;
+		double bR = Math.pow(aR, gamma);
+		double bG = Math.pow(aG, gamma);
+		double bB = Math.pow(aB, gamma);
+		setRed((int) (bR*255));
+		setGreen((int) (bG*255));
+		setBlue((int) (bB*255));
 	}
 	
 	public boolean isGrayscale() {
@@ -126,6 +128,14 @@ public class RGB {
 			}
 		}
 		return new RGB(sumRed/total, sumGreen/total, sumBlue/total);
+	}
+	
+	public RGB divide(int divider) {
+		return new RGB(getRed() / divider, getGreen() / divider, getBlue() / divider);
+	}
+	
+	public RGB approx(int length) {
+		return new RGB(Math.round(getRed() / length) * length, Math.round(getGreen() / length) * length, Math.round(getBlue() / length) * length);
 	}
 	
 	public static int toInt(int red, int green, int blue) {
