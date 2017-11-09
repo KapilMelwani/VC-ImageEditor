@@ -212,8 +212,11 @@ public class ImageFrame extends Frame {
 							int y = (int) aux.f(x);
 							pixels[k++] = new RGB(image.get().getRGB(x, y));
 						}
+						p1 = null;
+						p2 = null;
+						cs = false;
+						repaint();
 						ImageUtils.launchFrame(new HistogramFrame(pixels, ImageUtils.getImageFrame(e.getComponent())));
-						
 					}
 				}
 

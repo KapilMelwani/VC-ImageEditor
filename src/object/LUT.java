@@ -3,7 +3,6 @@ package object;
 import java.awt.image.BufferedImage;
 
 import utils.HistogramUtils;
-import utils.ImageUtils;
 
 public class LUT {
 	public static final int N_COLOR_VALUES = 256;

@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,8 +18,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import utils.ImageUtils;
-
 @SuppressWarnings("serial")
 public class GammaCorrectionFrame extends Frame {
 	
@@ -30,13 +27,11 @@ public class GammaCorrectionFrame extends Frame {
 	private JSpinner spinnerGamma;
 	private JLabel lbFormula;
 	private JButton btnReset;
-	private BufferedImage copy;
 
 	public GammaCorrectionFrame(ImageFrame parent) {
 		super(parent);
 		super.setTitle("Gamma Correction: " + parent.getTitle());
 
-		copy = ImageUtils.copyImage(parent.getImage());
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
 		setSpinnerGamma(new JSpinner(new SpinnerNumberModel(1.00, MIN_GAMMA, MAX_GAMMA, 0.01)));

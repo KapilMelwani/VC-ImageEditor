@@ -230,7 +230,7 @@ public class MainFrame extends JFrame {
 		btnROI.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				((ImageFrame)focusedFrame).getPanel().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-				((ImageFrame)focusedFrame).getPanel().setROI(true);
+				((ImageFrame)focusedFrame).getPanel().setROI(!((ImageFrame)focusedFrame).getPanel().isROI());
 			}
 		});
 		
@@ -238,7 +238,7 @@ public class MainFrame extends JFrame {
 		btnCrossSection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				((ImageFrame)focusedFrame).getPanel().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-				((ImageFrame)focusedFrame).getPanel().setCS(true);
+				((ImageFrame)focusedFrame).getPanel().setCS(!((ImageFrame)focusedFrame).getPanel().isCS());
 			}
 		});
 		
