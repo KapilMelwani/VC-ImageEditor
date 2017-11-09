@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -12,11 +11,9 @@ import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -30,7 +27,6 @@ import frames.Frame;
 import frames.Image;
 import frames.ImageFrame;
 import object.FunctionSegment;
-import object.LUT;
 import object.MousePixelListener;
 import object.Node;
 import panels.PixelColorPanel;
@@ -69,15 +65,12 @@ public class ImageUtils {
 		double scale = 1.0;
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension bounds = new Dimension((int) (screen.getWidth() * 0.75), (int) (screen.getHeight() * 0.75));
-		//System.out.println("Bounds = " + bounds);
-		//System.out.println("ImageIn = " + image);
 		while (image.getWidth() > bounds.getWidth() || image.getHeight() > bounds.getHeight()) {
 			scale -= 0.05;
 			int width = (int) (image.getWidth() * scale);
 			int height = (int) (image.getHeight() * scale);
 			image = new Dimension(width, height);
 		}
-		//System.out.println("ImageOut = " + image);
 		return image;
 	}
 
@@ -161,21 +154,6 @@ public class ImageUtils {
 		WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-	
-	public static int dynamicRange(BufferedImage image) {
-		LUT lut = new LUT(image);
-		int[][] grays = lut.getGrayMatrix();
-		List<Integer> aux = new ArrayList<Integer>();
-		for (int i = 0; i < image.getWidth(); i++)
-			for (int j = 0; j < image.getHeight(); j++)
-				if(!aux.contains(grays[j][i]))
-					aux.add(grays[j][i]);
-		return aux.size();
-	}
-
-	public static boolean isGrayscale(BufferedImage image) {
-		return false;
-	}
 
 	public static boolean isGrayscale(int[][] data) {
 		int r = 0, g = 0, b = 0;
@@ -201,29 +179,6 @@ public class ImageUtils {
 		return list;
 	}
 
-	public static Point getGrayRange(BufferedImage bi) {
-		int max = Integer.MIN_VALUE;
-		int min = Integer.MAX_VALUE;
-		BufferedImage grayscale = bi;
-		if (!(bi.getType() == BufferedImage.TYPE_BYTE_INDEXED))
-			grayscale = ImageUtils.rgbToGrayscaleCopyAuto(bi);
-
-		for (int i = 0; i < grayscale.getWidth(); i++)
-			for (int j = 0; j < grayscale.getHeight(); j++) {
-				Color color = new Color(grayscale.getRGB(i, j));
-				if (color.getRed() > max)
-					max = color.getRed();
-				if (color.getRed() < min)
-					min = color.getRed();
-			}
-		return new Point(min, max);
-	}
-	
-	public static double entropy(BufferedImage bi) {
-		
-		return 0.0d;
-	}
-
 	public static BufferedImage changeBrightness(BufferedImage original, float val) {
 		RescaleOp brighterOp = new RescaleOp(val, 0, null);
 		BufferedImage image = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
@@ -239,26 +194,18 @@ public class ImageUtils {
 	}
 
 	public static double contrast(BufferedImage image) {
-
 		int[] aux = new int[image.getWidth()*image.getHeight()];
 		int k = 0;
-		for (int row = 0; row < image.getHeight(); row++) {
-			for (int col = 0; col < image.getWidth(); col++) {
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++)
 				aux[k++] = ImageUtils.brightness(image.getRGB(col, row));
-			}
-		}
-		
 		double sum = 0.0, standardDeviation = 0.0;
-
-        for(int num : aux) {
+        for(int num : aux)
             sum += num;
-        }
-
         double mean = sum/aux.length;
 
-        for(int num: aux) {
+        for(int num: aux)
             standardDeviation += Math.pow(num - mean, 2);
-        }
 		return Math.sqrt(standardDeviation/aux.length);
 	}
 	
@@ -331,31 +278,7 @@ public class ImageUtils {
 			value = 255;
 		return value;
 	}
-	
-	public static Map.Entry<Integer, Integer> grayRange(BufferedImage bi) {
-		int max = Integer.MIN_VALUE;
-		int min = Integer.MAX_VALUE;
-		BufferedImage grayscale = rgbToGrayscaleCopyAuto(bi);
 
-		for (int i = 0; i < grayscale.getWidth(); i++)
-			for (int j = 0; j < grayscale.getHeight(); j++) {
-				Color color = new Color(grayscale.getRGB(i, j));
-				if (color.getRed() > max)
-					max = color.getRed();
-				if (color.getRed() < min)
-					min = color.getRed();
-			}
-		return new AbstractMap.SimpleEntry<Integer, Integer>(min, max);
-	}
-/*
-	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, JLabel lbCursorInfo,
-			PixelColorPanel pnMousePixelColor) {
-		ImageFrame frame = new ImageFrame(image, parent);
-		frame.getPanel().addMouseMotionListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-	}
-*/
 	public static void createNewImageFrame(String file, JLabel lbCursorInfo, PixelColorPanel pnMousePixelColor) {
 		ImageFrame frame = new ImageFrame(file);
 		frame.addMousePixelListener(new MousePixelListener(lbCursorInfo, pnMousePixelColor));

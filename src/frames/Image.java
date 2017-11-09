@@ -1,7 +1,9 @@
 package frames;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import object.FunctionSegment;
@@ -55,6 +57,10 @@ public class Image {
 	
 	public void reset() {
 		setImage(ImageUtils.copyImage(getOriginal()));
+	}
+	
+	public void reset(BufferedImage image) {
+		setImage(ImageUtils.copyImage(image));
 	}
 	
 	public int getWidth() {
@@ -170,10 +176,10 @@ public class Image {
 	}
 	
 	public BufferedImage linearTransform(List<FunctionSegment> f) {
-		BufferedImage aux = ImageUtils.copyImage(get());
-		for (int row = 0; row < aux.getHeight(); row++) {
-			for (int col = 0; col < aux.getWidth(); col++) {
-				int[] rgb = ColorUtils.intToRGB(aux.getRGB(col, row));
+		//BufferedImage aux = ImageUtils.copyImage(get());
+		for (int row = 0; row < get().getHeight(); row++) {
+			for (int col = 0; col < get().getWidth(); col++) {
+				int[] rgb = ColorUtils.intToRGB(getOriginal().getRGB(col, row));
 				for(int i = 0; i <rgb.length; i++) {
 					for (FunctionSegment segment : f) {
 						if (segment.getP1().getX() <= rgb[i]) {
@@ -182,10 +188,10 @@ public class Image {
 						}
 					}
 				}
-				aux.setRGB(col, row, ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]));
+				get().setRGB(col, row, ColorUtils.rgbToInt(rgb[0], rgb[1], rgb[2]));
 			}
 		}
-		return aux;
+		return null;
 	}
 	
 	public Image difference(Image newImage) {
@@ -296,6 +302,31 @@ public class Image {
 			for (int col = 0; col < image.getWidth(); col++) {
 				get().setRGB(col, row, new RGB(get().getRGB(col, row)).gamma(gamma).toInt());
 			}
+	}
+	
+	public int dynamicRange() {
+		RGB[][] lut = new LUT(get()).getLut();
+		List<Integer> aux = new ArrayList<Integer>();
+		for (int i = 0; i < get().getWidth(); i++)
+			for (int j = 0; j < get().getHeight(); j++)
+				if(!aux.contains(lut[j][i].gray()))
+					aux.add(lut[j][i].gray());
+		return aux.size();
+	}
+	
+	public Point grayRange() {
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
+		RGB[][] lut = new LUT(get()).getLut();
+		for (int i = 0; i < get().getWidth(); i++)
+			for (int j = 0; j < get().getHeight(); j++) {
+				int gray = lut[j][i].gray();
+				if (gray > max)
+					max = gray;
+				if (gray < min)
+					min = gray;
+			}
+		return new Point(min, max);
 	}
 	
 	public BufferedImage get() { return image; }

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,6 +14,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import utils.ImageUtils;
 
 @SuppressWarnings("serial")
 public class LinearAdjustmentFrame extends Frame {
@@ -26,6 +29,7 @@ public class LinearAdjustmentFrame extends Frame {
 	private JButton btnReset;
 	
 	private double brightness, contrast;
+	private BufferedImage copy;
 
 	public LinearAdjustmentFrame(ImageFrame parent) {
 		super(parent);
@@ -33,6 +37,7 @@ public class LinearAdjustmentFrame extends Frame {
 
 		brightness = parent.image.brightness();
 		contrast = parent.image.contrast();
+		copy = ImageUtils.copyImage(parent.getImage());
 		
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
@@ -62,7 +67,7 @@ public class LinearAdjustmentFrame extends Frame {
 
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.resetImage();
+				parent.image.reset(copy);
 				spinnerBrightness.setValue(brightness);
 				spinerContrast.setValue(contrast);
 			}

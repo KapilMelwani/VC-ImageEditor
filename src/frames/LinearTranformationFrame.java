@@ -1,15 +1,12 @@
 package frames;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import panels.InfoPanel;
 import panels.LinearTransformationPanel;
@@ -22,19 +19,22 @@ public class LinearTranformationFrame extends Frame {
 	private InfoPanel info;
 	private JButton btnCreate;
 	
+	private BufferedImage copy;
+	
 	public LinearTranformationFrame(ImageFrame parent) {
 		super(parent);
 		info = new InfoPanel();
+		copy = ImageUtils.copyImage(parent.getImage());
 		setTitle("Linear Tranformation: " + parent.getTitle());
 		setPanel(new LinearTransformationPanel());
 		getPanel().getNodes().addObserver(info);
 		btnCreate = new JButton("Transform Image");
 		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				BufferedImage image = getParentFrame().image.linearTransform(ImageUtils.returnSegments(panel.getNodes().getList()));
-				ImageUtils.createNewImageFrame(image, parent);
-				((JFrame) SwingUtilities.getRoot((Component) e.getSource())).dispose();
+				getParentFrame().image.reset(copy);
+				getParentFrame().image.linearTransform(ImageUtils.returnSegments(panel.getNodes().getList()));
+				getParentFrame().getPanel().repaint();
+				//((JFrame) SwingUtilities.getRoot((Component) e.getSource())).dispose();
 			}
 		});
 		setParent(parent);
@@ -46,20 +46,9 @@ public class LinearTranformationFrame extends Frame {
 		pack();
 	}
 
-	public LinearTransformationPanel getPanel() {
-		return panel;
-	}
-
-	public void setPanel(LinearTransformationPanel panel) {
-		this.panel = panel;
-	}
-
-	public InfoPanel getInfo() {
-		return info;
-	}
-
-	public void setInfo(InfoPanel info) {
-		this.info = info;
-	}
+	public LinearTransformationPanel getPanel() { return panel; }
+	public InfoPanel getInfo() { return info; }
+	public void setPanel(LinearTransformationPanel panel) { this.panel = panel; }
+	public void setInfo(InfoPanel info) { this.info = info; }
 	
 }

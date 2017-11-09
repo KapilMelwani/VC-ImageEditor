@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,6 +17,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import utils.ImageUtils;
+
 @SuppressWarnings("serial")
 public class GammaCorrectionFrame extends Frame {
 	
@@ -25,11 +28,13 @@ public class GammaCorrectionFrame extends Frame {
 	private JSpinner spinnerGamma;
 	private JLabel lbFormula;
 	private JButton btnReset;
+	private BufferedImage copy;
 
 	public GammaCorrectionFrame(ImageFrame parent) {
 		super(parent);
 		super.setTitle("Gamma Correction: " + parent.getTitle());
 
+		copy = ImageUtils.copyImage(parent.getImage());
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
 		setSpinnerGamma(new JSpinner(new SpinnerNumberModel(1.00, MIN_GAMMA, MAX_GAMMA, 0.01)));
@@ -54,22 +59,14 @@ public class GammaCorrectionFrame extends Frame {
 
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.resetImage();
-				getSpinnerGamma().setValue(100);
+				parent.image.reset(copy);
+				getSpinnerGamma().setValue(1.00);
 			}
 		});
 		setMinimumSize(new Dimension(300, 50));
 		pack();
 	}
-	/*
-	private void gamma(double gamma) {
-		for (int row = 0; row < image.getHeight(); row++)
-			for (int col = 0; col < image.getWidth(); col++) {
-				BufferedImage aux = parent.getImage();
-				aux.setRGB(col, row, ImageUtils.gamma(image.getRGB(col, row), gamma));
-			}
-	}
-*/
+
 	public JLabel getLbFormula() { return lbFormula; }
 	public JButton getBtnReset() { return btnReset; }
 	public void setLbFormula(JLabel lbFormula) { this.lbFormula = lbFormula; }
