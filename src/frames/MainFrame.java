@@ -173,11 +173,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(focusedFrame == null)
 					return;
-				File selectedFile = ImageUtils.openImage();
-				if(selectedFile == null)
-					return;
-				Image image = ((ImageFrame)focusedFrame).image.difference(new Image(selectedFile.getAbsolutePath()));
-				ImageUtils.createNewImageFrame(image, focusedFrame);
+				ImageUtils.launchFrame(new DifferenceFrame(focusedFrame));
 			}
 		});	    
 		

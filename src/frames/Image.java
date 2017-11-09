@@ -1,5 +1,6 @@
 package frames;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -328,6 +329,16 @@ public class Image {
 					min = gray;
 			}
 		return new Point(min, max);
+	}
+	
+	public BufferedImage colorChangeMap(int threshold) {
+		BufferedImage aux = ImageUtils.copyImage(get());
+		RGB[][] rgb = new LUT(aux).getLut();
+		for (int row = 0; row < get().getHeight(); row++)
+			for (int col = 0; col < get().getWidth(); col++)
+				if(rgb[col][row].gray() >= threshold)
+					aux.setRGB(col, row, Color.RED.getRGB());
+		return aux;
 	}
 	
 	public BufferedImage get() { return image; }
