@@ -34,9 +34,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.imageio.ImageIO;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JRadioButtonMenuItem;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame {
@@ -53,13 +51,9 @@ public class MainFrame extends JFrame {
 
 	private ImageFrame focusedFrame;
 	private JMenu mnEdit, mntmColor, mnOrignal;
-	//private JRadioButtonMenuItem rbmiRGB, rbmiGrayscale;
 	
 	public static List<Frame> frames = new ArrayList<Frame>();
 
-	/**
-	 * Create the frame.
-	 */
 	public MainFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 450, 300);
@@ -117,18 +111,6 @@ public class MainFrame extends JFrame {
 		menuBar.add(mnEdit);
 		
 		mntmColor = new JMenu("Color");
-		// ButtonGroup for radio buttons
-	    ButtonGroup directionGroup = new ButtonGroup();
-
-	    // Edit->Options->Forward, F - Mnemonic, in group
-	    JRadioButtonMenuItem rbmiRGB = new JRadioButtonMenuItem("RGB", true);
-	    mntmColor.add(rbmiRGB);
-	    directionGroup.add(rbmiRGB);
-
-	    // Edit->Options->Backward, B - Mnemonic, in group
-	    JRadioButtonMenuItem rbmiGrayscale = new JRadioButtonMenuItem("Grayscale");
-	    mntmColor.add(rbmiGrayscale);
-	    directionGroup.add(rbmiGrayscale);
 	    
 	    mntmToGrayscale = new JMenuItem("Convert to Grayscale");
 	    mntmToGrayscale.addActionListener(new ActionListener() {
@@ -139,8 +121,6 @@ public class MainFrame extends JFrame {
 			}
 		});
 	    mntmColor.add(mntmToGrayscale);
-	    
-		mnEdit.add(mntmColor);
 		
 		mntmHistogram = new JMenuItem("Histogram");
 		mntmHistogram.addActionListener(new ActionListener() {
@@ -150,7 +130,6 @@ public class MainFrame extends JFrame {
 				ImageUtils.launchFrame(new HistogramFrame(focusedFrame));
 			}
 		});	    
-		mnEdit.add(mntmHistogram);
 		
 		mntmLinearTrans = new JMenuItem("Linear Transformation");
 		mntmLinearTrans.addActionListener(new ActionListener() {
@@ -160,7 +139,6 @@ public class MainFrame extends JFrame {
 				ImageUtils.launchFrame(new LinearTranformationFrame(focusedFrame));
 			}
 		});	    
-		mnEdit.add(mntmLinearTrans);
 		
 		mntmLinearAdjust = new JMenuItem("Linear Adjustment");
 		mntmLinearAdjust.addActionListener(new ActionListener() {
@@ -171,7 +149,6 @@ public class MainFrame extends JFrame {
 				//ImageUtils.launchFrame(new LinearAdjustmentSliderFrame(focusedFrame));
 			}
 		});	    
-		mnEdit.add(mntmLinearAdjust);
 		
 		mntmGammaCorrect = new JMenuItem("Gamma Correction");
 		mntmGammaCorrect.addActionListener(new ActionListener() {
@@ -181,7 +158,6 @@ public class MainFrame extends JFrame {
 				ImageUtils.launchFrame(new GammaCorrectionFrame(focusedFrame));
 			}
 		});	    
-		mnEdit.add(mntmGammaCorrect);
 		
 		mntmProperties = new JMenuItem("Properties");
 		mntmProperties.addActionListener(new ActionListener() {
@@ -191,7 +167,6 @@ public class MainFrame extends JFrame {
 				ImageUtils.launchFrame(new PropertiesFrame(focusedFrame));
 			}
 		});	    
-		mnEdit.add(mntmProperties);
 		
 		mntmDifference = new JMenuItem("Difference");
 		mntmDifference.addActionListener(new ActionListener() {
@@ -205,7 +180,6 @@ public class MainFrame extends JFrame {
 				ImageUtils.createNewImageFrame(image, focusedFrame);
 			}
 		});	    
-		mnEdit.add(mntmDifference);
 		
 		mntmDigitalization = new JMenuItem("Simulate Digitalization");
 		mntmDigitalization.addActionListener(new ActionListener() {
@@ -215,7 +189,15 @@ public class MainFrame extends JFrame {
 				ImageUtils.launchFrame(new DigitalizationFrame(focusedFrame));
 			}
 		});	    
+		
+		mnEdit.add(mntmColor);
+		mnEdit.add(mntmLinearTrans);
+		mnEdit.add(mntmLinearAdjust);
+		mnEdit.add(mntmGammaCorrect);
+	    mnEdit.add(mntmHistogram);
+		mnEdit.add(mntmDifference);
 		mnEdit.add(mntmDigitalization);
+		mnEdit.add(mntmProperties);
 		
 		mnOrignal = new JMenu("Original");
 		menuBar.add(mnOrignal);

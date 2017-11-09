@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
@@ -59,12 +61,18 @@ public class GammaCorrectionFrame extends Frame {
 
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.image.reset(copy);
+				parent.image.resetMiddle();
 				getSpinnerGamma().setValue(1.00);
 			}
 		});
 		setMinimumSize(new Dimension(300, 50));
 		pack();
+		
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    		getParentFrame().image.setMiddleCopy();
+		    }
+		});
 	}
 
 	public JLabel getLbFormula() { return lbFormula; }

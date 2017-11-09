@@ -5,7 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,16 +16,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import utils.ImageUtils;
-
 @SuppressWarnings("serial")
 public class DigitalizationFrame extends Frame {
 	
 	private JSpinner sampleSpinner, colorSpinner;
 	private JButton btnReset;
 	
-	private BufferedImage copy;
-
 	public DigitalizationFrame(ImageFrame parent) {
 		super(parent);
 		setSampleSpinner(new JSpinner(new SpinnerNumberModel(1, 1, 100, 1)));
@@ -33,8 +30,6 @@ public class DigitalizationFrame extends Frame {
 		setColorSpinner(new JSpinner(new SpinnerNumberModel(8, 1, 8, 1)));
 		getColorSpinner().setBorder(BorderFactory.createTitledBorder("Color"));
 
-		copy = ImageUtils.copyImage(parent.getImage());
-		
 		JPanel panel = new JPanel(new GridLayout(1,2));
 		panel.add(getSampleSpinner());
 		panel.add(getColorSpinner());
@@ -60,13 +55,19 @@ public class DigitalizationFrame extends Frame {
 		
 		getBtnReset().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.image.reset(copy);
+				parent.image.resetMiddle();
 				getSampleSpinner().setValue(1);
 				getColorSpinner().setValue(8);
 			}
 		});
 		setPreferredSize(new Dimension(300,100));
 		pack();
+		
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    		getParentFrame().image.setMiddleCopy();
+		    }
+		});
 	}
 
 	public JSpinner getSampleSpinner() { return sampleSpinner; }

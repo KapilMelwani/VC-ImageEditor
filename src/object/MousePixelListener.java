@@ -37,12 +37,13 @@ public class MousePixelListener implements MouseMotionListener {
 		int y = (int) (e.getY() * panel.getScale());
 		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(image.get().getRGB(x, y));
-		colorPanel.setColor(color);
+		RGB color = new RGB(image.get().getRGB(x, y));
+		colorPanel.setColor(new Color(color.toInt()));
 		label.setText(	"x = " + x +
 						", y = " + y +
 						", [" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + "] " +
-						String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()));
+						String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()) +
+						", gray = " + color.gray());
 	}
 
 	@Override
@@ -55,12 +56,13 @@ public class MousePixelListener implements MouseMotionListener {
 		int y = (int) (e.getY() * panel.getScale());
 		if(x > image.getWidth() || x < 0 || y > image.getHeight() || y < 0)
 			return;
-		Color color = new Color(image.get().getRGB(x, y));
-		colorPanel.setColor(color);
+		RGB color = new RGB(image.get().getRGB(x, y));
+		colorPanel.setColor(new Color(color.toInt()));
 		label.setText(	"<html>x = " + x +
 				", y = " + y +
 				", [<font color='red'>" + color.getRed() + "</font>, <font color='green'>" + color.getGreen() + "</font>, <font color='blue'>" + color.getBlue() + "</font>] " +
-				String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()) + "</html>");
+				String.format("(#%02x%02x%02x)", color.getRed(), color.getGreen(), color.getBlue()) +
+				"</font>, [<font color='gray'>" + color.gray() + "</font>]</html>");
 	}
 
 	/**

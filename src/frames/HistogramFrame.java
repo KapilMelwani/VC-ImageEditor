@@ -21,6 +21,7 @@ import object.LUT;
 import object.MouseHistogramListener;
 import object.RGB;
 import panels.HistogramPanel;
+import utils.HistogramUtils;
 import utils.ImageUtils;
 
 @SuppressWarnings("serial")
@@ -96,7 +97,7 @@ public class HistogramFrame extends Frame {
 		}
 
 		getPanel1().newHistogramLayer(lut.grayCount(), Color.DARK_GRAY, true, "Gray");
-		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.MAGENTA, true, "Cumulative");
+		getPanel2().newHistogramLayer(lut.cumulativeCount(), Color.GRAY, true, "Cumulative");
 
 		getTabbedPane().addTab("Color", getPanel1());
 		getTabbedPane().addTab("Cumulative", getPanel2());
@@ -120,28 +121,22 @@ public class HistogramFrame extends Frame {
 				File selectedFile = ImageUtils.openImage();
 				if(selectedFile == null)
 					return;
-				Image desired = new Image(selectedFile.getAbsolutePath());
-				double[] sk = new LUT(getParentFrame().getImage()).cumulativeNormalizedCount();
-				double[] zk = new LUT(desired.get()).cumulativeNormalizedCount();
-				double[] z = new double[sk.length];
-				int[] n = new int[sk.length];
-				int zki = 0, ski = 0, zi = 0, ni = 0;
-				while(zki < zk.length) {
-					double value = zk[zki] - sk[ski];
-					while(value < 0) {
-						value = zk[zki] - sk[++ski];
-					}
-					z[zi] = value;
-					n[ni++] = zki++;
-				}
-				BufferedImage aux = new Image(ImageUtils.copyImage(parent.getImage())).toGrayScale();
+				Image desiredImage = new Image(selectedFile.getAbsolutePath());
+				LUT current = new LUT(getParentFrame().image.get());
+				LUT desired = new LUT(desiredImage.get());
+				
+				int[] r = HistogramUtils.specify(current.redCumulativeNormalizedCount(), desired.redCumulativeNormalizedCount());
+				int[] g = HistogramUtils.specify(current.greenCumulativeNormalizedCount(), desired.greenCumulativeNormalizedCount());
+				int[] b = HistogramUtils.specify(current.blueCumulativeNormalizedCount(), desired.blueCumulativeNormalizedCount());
+				
+				BufferedImage aux = ImageUtils.copyImage(parent.image.get());
 				for(int row = 0; row < aux.getHeight(); row++)
 					for(int col = 0; col < aux.getWidth(); col++) {
-						int value = new Color(aux.getRGB(col, row)).getRed();
-						int newColor = new Color(n[value], n[value], n[value]).getRGB();
+						RGB value = new RGB(aux.getRGB(col, row));
+						int newColor = new RGB(r[value.getRed()], g[value.getGreen()], b[value.getBlue()]).toInt();
 						aux.setRGB(col, row, newColor);
 					}
-				ImageUtils.createNewImageFrame(aux, getParentFrame());	
+				ImageUtils.createNewImageFrame(aux, getParentFrame(), getTitle().replace("Histogram: ", "") + " (Specified " + desiredImage.getFileName() + ")");	
 			}
 		});
 		
@@ -155,7 +150,7 @@ public class HistogramFrame extends Frame {
 				for(int i = 0; i < result.length; i++)
 		        	for(int j = 0; j < result[i].length; j++)
 		        		aux.setRGB(i, j, new Color(result[i][j],result[i][j],result[i][j]).getRGB());
-		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent);
+		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent, getTitle().replace("Histogram: ", "") + " (Equalized GS)");
 			}
 		});
 		
@@ -175,7 +170,7 @@ public class HistogramFrame extends Frame {
 				for(int i = 0; i < resultR.length; i++)
 		        	for(int j = 0; j < resultR[i].length; j++)
 		        		aux.setRGB(i, j, new Color(resultR[i][j],resultG[i][j],resultB[i][j]).getRGB());
-		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent);
+		        ImageUtils.createNewImageFrame(aux, (ImageFrame)parent, getTitle().replace("Histogram: ", "") + " (Equalized RGB)");
 			}
 		});
 

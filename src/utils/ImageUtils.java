@@ -271,7 +271,7 @@ public class ImageUtils {
 		return value;
 	}
 	
-	public static float truncate(float value) {
+	public static double truncate(double value) {
 		if (value < 0)
 			value = 0;
 		else if (value > 255)
@@ -292,10 +292,26 @@ public class ImageUtils {
 		launchFrame(frame);
 	}
 	
+	public static void createNewImageFrame(BufferedImage image, ImageFrame parent, String title) {
+		MousePixelListener aux = parent.getMousePixelListener();
+		ImageFrame frame = new ImageFrame(image, parent);
+		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
+		frame.setTitle(title);
+		launchFrame(frame);
+	}
+	
 	public static void createNewImageFrame(Image image, ImageFrame parent) {
 		MousePixelListener aux = parent.getMousePixelListener();
 		ImageFrame frame = new ImageFrame(image.get(), parent);
 		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
+		launchFrame(frame);
+	}
+	
+	public static void createNewImageFrame(Image image, ImageFrame parent, String title) {
+		MousePixelListener aux = parent.getMousePixelListener();
+		ImageFrame frame = new ImageFrame(image.get(), parent);
+		frame.addMousePixelListener(new MousePixelListener(aux.getLabel(), aux.getColorPanel()));
+		frame.setTitle(title);
 		launchFrame(frame);
 	}
 

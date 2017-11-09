@@ -31,7 +31,7 @@ public class RGB {
 		return (int) (getRed() * NTSC_RED + getGreen() * NTSC_GREEN + getBlue() * NTSC_BLUE);
 	}
 	
-	public RGB gamma(double gamma) {
+	public RGB gammaMod(double gamma) {
 		double gammaCorrection = 1 / gamma;
 		int r = (int) (255 * Math.pow((double)(getRed() / 255d), gammaCorrection));
 		int g = (int) (255 * Math.pow((double)(getGreen() / 255d), gammaCorrection));
@@ -39,16 +39,14 @@ public class RGB {
 		return new RGB(r,g,b);
 	}
 	
-	public void gammaMod(double gamma) {
-		double aR = getRed() / 255;
-		double aG = getGreen() / 255;
-		double aB = getBlue() / 255;
+	public RGB gamma(double gamma) {
+		double aR = (double)getRed() / 255.0d;
+		double aG = (double)getGreen() / 255.0d;
+		double aB = (double)getBlue() / 255.0d;
 		double bR = Math.pow(aR, gamma);
 		double bG = Math.pow(aG, gamma);
 		double bB = Math.pow(aB, gamma);
-		setRed((int) (bR*255));
-		setGreen((int) (bG*255));
-		setBlue((int) (bB*255));
+		return new RGB((int) (bR*255), (int) (bG*255), (int) (bB*255));
 	}
 	
 	public boolean isGrayscale() {

@@ -5,7 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -14,8 +15,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import utils.ImageUtils;
 
 @SuppressWarnings("serial")
 public class LinearAdjustmentFrame extends Frame {
@@ -29,7 +28,6 @@ public class LinearAdjustmentFrame extends Frame {
 	private JButton btnReset;
 	
 	private double brightness, contrast;
-	private BufferedImage copy;
 
 	public LinearAdjustmentFrame(ImageFrame parent) {
 		super(parent);
@@ -37,7 +35,6 @@ public class LinearAdjustmentFrame extends Frame {
 
 		brightness = parent.image.brightness();
 		contrast = parent.image.contrast();
-		copy = ImageUtils.copyImage(parent.getImage());
 		
 		JPanel panel = new JPanel(new GridLayout(2, 0, 0, 0));
 
@@ -67,13 +64,19 @@ public class LinearAdjustmentFrame extends Frame {
 
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.image.reset(copy);
+				parent.image.resetMiddle();
 				spinnerBrightness.setValue(brightness);
 				spinerContrast.setValue(contrast);
 			}
 		});
 		setMinimumSize(new Dimension(300, 50));
 		pack();
+		
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    		getParentFrame().image.setMiddleCopy();
+		    }
+		});
 	}
 	
 	private void refreshBrCn() {

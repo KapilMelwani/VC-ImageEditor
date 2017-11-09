@@ -3,6 +3,7 @@ package object;
 import java.awt.image.BufferedImage;
 
 import utils.HistogramUtils;
+import utils.ImageUtils;
 
 public class LUT {
 	public static final int N_COLOR_VALUES = 256;
@@ -146,21 +147,52 @@ public class LUT {
 		}
 		return aux;
 	}
-
-	public int[] cumulativeCount() {
-		int[] aux = grayCount();
-		for(int i = 1; i < aux.length; i++)
-			aux[i] = aux[i] + aux[i-1];
-		return aux;
-	}
 	
 	public double[] cumulativeNormalizedCount() {
 		int[] aux = cumulativeCount();
 		double[] auxDouble = new double[aux.length];
 		int total = lut.length * lut[0].length;
 		for(int i = 0; i < aux.length; i++)
-			auxDouble[i] = aux[i] / total;
+			auxDouble[i] = (double)aux[i] / (double)total;
+			//auxDouble[i] = ImageUtils.truncate(aux[i] / (double)total);
 		return auxDouble;
+	}
+	
+	public double[] redCumulativeNormalizedCount() {
+		int[] aux = cumulativeRedCount();
+		double[] auxDouble = new double[aux.length];
+		int total = lut.length * lut[0].length;
+		for(int i = 0; i < aux.length; i++)
+			auxDouble[i] = (double)aux[i] / (double)total;
+			//auxDouble[i] = ImageUtils.truncate(aux[i] / (double)total);
+		return auxDouble;
+	}
+	
+	public double[] greenCumulativeNormalizedCount() {
+		int[] aux = cumulativeGreenCount();
+		double[] auxDouble = new double[aux.length];
+		int total = lut.length * lut[0].length;
+		for(int i = 0; i < aux.length; i++)
+			auxDouble[i] = (double)aux[i] / (double)total;
+			//auxDouble[i] = ImageUtils.truncate(aux[i] / (double)total);
+		return auxDouble;
+	}
+	
+	public double[] blueCumulativeNormalizedCount() {
+		int[] aux = cumulativeBlueCount();
+		double[] auxDouble = new double[aux.length];
+		int total = lut.length * lut[0].length;
+		for(int i = 0; i < aux.length; i++)
+			auxDouble[i] = (double)aux[i] / (double)total;
+			//auxDouble[i] = ImageUtils.truncate(aux[i] / (double)total);
+		return auxDouble;
+	}
+	
+	public int[] cumulativeCount() {
+		int[] aux = grayCount();
+		for(int i = 1; i < aux.length; i++)
+			aux[i] = aux[i] + aux[i-1];
+		return aux;
 	}
 	
 	public int[] cumulativeRedCount() {

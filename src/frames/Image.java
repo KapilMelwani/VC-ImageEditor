@@ -14,19 +14,21 @@ import utils.ImageUtils;
 
 public class Image {
 	
-	private BufferedImage image, original;
+	private BufferedImage image, original, middleCopy;
 	private String path;
 	
 	public Image(String path) {
 		setPath(path);
 		setImage(ImageUtils.readImage(getPath()));
 		setOriginal(ImageUtils.readImage(getPath()));
+		setMiddleCopy();
 	}
 	
 	public Image(BufferedImage image) {
 		setPath(null);
 		setImage(ImageUtils.copyImage(image));
 		setOriginal(ImageUtils.copyImage(image));
+		setMiddleCopy();
 	}
 	
 	public Dimension getImageDimension() {
@@ -59,8 +61,13 @@ public class Image {
 		setImage(ImageUtils.copyImage(getOriginal()));
 	}
 	
+	public void resetMiddle() {
+		setImage(ImageUtils.copyImage(getMiddleCopy()));
+	}
+	
 	public void reset(BufferedImage image) {
 		setImage(ImageUtils.copyImage(image));
+		original = ImageUtils.copyImage(image);
 	}
 	
 	public int getWidth() {
@@ -118,7 +125,7 @@ public class Image {
 		double B = brightness - ImageUtils.brightness(getOriginal()) * A;
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
-				int[] rgb = ColorUtils.intToRGB(original.getRGB(col, row));
+				int[] rgb = ColorUtils.intToRGB(getMiddleCopy().getRGB(col, row));
 				rgb[0] = ImageUtils.truncate((int) (rgb[0] * A + B));
 				rgb[1] = ImageUtils.truncate((int) (rgb[1] * A + B));
 				rgb[2] = ImageUtils.truncate((int) (rgb[2] * A + B));
@@ -130,35 +137,27 @@ public class Image {
 	public double brightness() {
 		int sum = 0;
 		int total = image.getWidth() * image.getHeight();
-		for (int row = 0; row < image.getHeight(); row++) {
-			for (int col = 0; col < image.getWidth(); col++) {
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++)
 				sum += ImageUtils.brightness(image.getRGB(col, row));
-			}
-		}
 		return sum / total;
 	}
 	
 	public double contrast() {
-
 		int[] aux = new int[image.getWidth()*image.getHeight()];
 		int k = 0;
-		for (int row = 0; row < image.getHeight(); row++) {
-			for (int col = 0; col < image.getWidth(); col++) {
+		for (int row = 0; row < image.getHeight(); row++)
+			for (int col = 0; col < image.getWidth(); col++)
 				aux[k++] = ImageUtils.brightness(image.getRGB(col, row));
-			}
-		}
 		
 		double sum = 0.0, standardDeviation = 0.0;
-
-        for(int num : aux) {
+        for(int num : aux)
             sum += num;
-        }
 
         double mean = sum/aux.length;
-
-        for(int num: aux) {
+        for(int num: aux)
             standardDeviation += Math.pow(num - mean, 2);
-        }
+        
 		return Math.sqrt(standardDeviation/aux.length);
 	}
 	
@@ -179,7 +178,7 @@ public class Image {
 		//BufferedImage aux = ImageUtils.copyImage(get());
 		for (int row = 0; row < get().getHeight(); row++) {
 			for (int col = 0; col < get().getWidth(); col++) {
-				int[] rgb = ColorUtils.intToRGB(getOriginal().getRGB(col, row));
+				int[] rgb = ColorUtils.intToRGB(getMiddleCopy().getRGB(col, row));
 				for(int i = 0; i <rgb.length; i++) {
 					for (FunctionSegment segment : f) {
 						if (segment.getP1().getX() <= rgb[i]) {
@@ -242,7 +241,7 @@ public class Image {
 	}
 	
 	public BufferedImage downsample(int sampleSize) {
-		BufferedImage aux = ImageUtils.copyImage(getOriginal());
+		BufferedImage aux = ImageUtils.copyImage(getMiddleCopy());
 		
 		for (int row = 0; row < aux.getHeight(); row += sampleSize) {
 			for (int col = 0; col < aux.getWidth(); col += sampleSize) {
@@ -279,7 +278,7 @@ public class Image {
 		int n = 8 - bits;
 		for (int row = 0; row < get().getHeight(); row++) {
 			for (int col = 0; col < get().getWidth(); col++) {
-				RGB value = new RGB(getOriginal().getRGB(col, row));
+				RGB value = new RGB(getMiddleCopy().getRGB(col, row));
 				RGB newColor = value.divide((int) Math.pow(2, n));
 				get().setRGB(col, row, newColor.toInt());
 			}
@@ -290,7 +289,7 @@ public class Image {
 		int length = 256 / bits;
 		for (int row = 0; row < get().getHeight(); row++) {
 			for (int col = 0; col < get().getWidth(); col++) {
-				RGB value = new RGB(getOriginal().getRGB(col, row));
+				RGB value = new RGB(getMiddleCopy().getRGB(col, row));
 				RGB newColor = value.approx(length);
 				get().setRGB(col, row, newColor.toInt());
 			}
@@ -298,9 +297,11 @@ public class Image {
 	}
 	
 	public void gamma(double gamma) {
-		for (int row = 0; row < image.getHeight(); row++)
-			for (int col = 0; col < image.getWidth(); col++) {
-				get().setRGB(col, row, new RGB(get().getRGB(col, row)).gamma(gamma).toInt());
+		RGB[][] lut = new LUT(getMiddleCopy()).getLut();
+		for (int row = 0; row < get().getHeight(); row++)
+			for (int col = 0; col < get().getWidth(); col++) {
+				RGB i = lut[col][row].gamma(gamma);
+				get().setRGB(col, row, i.toInt());
 			}
 	}
 	
@@ -309,8 +310,8 @@ public class Image {
 		List<Integer> aux = new ArrayList<Integer>();
 		for (int i = 0; i < get().getWidth(); i++)
 			for (int j = 0; j < get().getHeight(); j++)
-				if(!aux.contains(lut[j][i].gray()))
-					aux.add(lut[j][i].gray());
+				if(!aux.contains(lut[i][j].gray()))
+					aux.add(lut[i][j].gray());
 		return aux.size();
 	}
 	
@@ -320,7 +321,7 @@ public class Image {
 		RGB[][] lut = new LUT(get()).getLut();
 		for (int i = 0; i < get().getWidth(); i++)
 			for (int j = 0; j < get().getHeight(); j++) {
-				int gray = lut[j][i].gray();
+				int gray = lut[i][j].gray();
 				if (gray > max)
 					max = gray;
 				if (gray < min)
@@ -331,15 +332,12 @@ public class Image {
 	
 	public BufferedImage get() { return image; }
 	public String getPath() { return path; }
+	public BufferedImage getOriginal() { return original; }
+	public BufferedImage getMiddleCopy() { return middleCopy; }
 	public void setImage(BufferedImage image) { this.image = image; }
 	public void setPath(String path) { this.path = path; }
-
-	public BufferedImage getOriginal() {
-		return original;
-	}
-
-	public void setOriginal(BufferedImage original) {
-		this.original = original;
-	}
+	public void setOriginal(BufferedImage original) { this.original = original; }
+	public void setMiddleCopy(BufferedImage middleCopy) { this.middleCopy = ImageUtils.copyImage(middleCopy); }
+	public void setMiddleCopy() { this.middleCopy = ImageUtils.copyImage(get()); }
 
 }
