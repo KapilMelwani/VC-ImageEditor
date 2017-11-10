@@ -38,6 +38,9 @@ public class FunctionSegment implements Comparable<FunctionSegment> {
 	public String toString() {
 		return "y = " + String.format("%.2f", getM()) + "x + " + String.format("%.2f", getB()) + " | [(" + p1.x + ", " + p1.y + ") --> (" + p2.x + ", " + p2.y + ")]";
 	}
+	public boolean contains(int x) {
+		return x >= getP1().x && x <= getP2().x;
+	}
 	@Override
 	public int compareTo(FunctionSegment arg0) {
 		return (int) (getP1().getX() - arg0.getP1().getX());

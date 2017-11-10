@@ -48,7 +48,8 @@ public class DigitalizationFrame extends Frame {
 		
 		getColorSpinner().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
-				getParentFrame().image.changeColorDepth2((Integer) getColorSpinner().getValue());
+				int bits = (Integer) getColorSpinner().getValue();
+				getParentFrame().image.changeColorDepth(bits);
 				getParentFrame().getPanel().repaint();
 			}
 		});

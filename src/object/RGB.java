@@ -56,7 +56,7 @@ public class RGB {
 	}
 	
 	public int toInt() {
-		return new Color(getRed(), getGreen(), getBlue()).getRGB();
+		return RGB.toInt(getRed(), getGreen(), getBlue());
 	}
 
 	/**
@@ -128,12 +128,21 @@ public class RGB {
 		return new RGB(sumRed/total, sumGreen/total, sumBlue/total);
 	}
 	
-	public RGB divide(int divider) {
-		return new RGB(getRed() / divider, getGreen() / divider, getBlue() / divider);
+	public void approxMod(int length) {
+		setRed(round(getRed(), length));
+		setGreen(round(getGreen(), length));
+		setBlue(round(getBlue(), length));
 	}
 	
 	public RGB approx(int length) {
-		return new RGB(Math.round(getRed() / length) * length, Math.round(getGreen() / length) * length, Math.round(getBlue() / length) * length);
+		//System.out.println(round(getRed(), length));
+		return new RGB(round(getRed(), length), round(getGreen(), length), round(getBlue(), length));
+	}
+	
+	public static int round(int value, int length) {
+		
+		double val = (double)((double)value / (double)length);
+		return (int) (length * Math.floor(val));
 	}
 	
 	public static int toInt(int red, int green, int blue) {

@@ -122,8 +122,8 @@ public class Image {
 	}
 	
 	public void adjustment2(double brightness, double contrast) {
-		double A = contrast / ImageUtils.contrast(getOriginal());
-		double B = brightness - ImageUtils.brightness(getOriginal()) * A;
+		double A = contrast / ImageUtils.contrast(getMiddleCopy());
+		double B = brightness - ImageUtils.brightness(getMiddleCopy()) * A;
 		for (int row = 0; row < image.getHeight(); row++) {
 			for (int col = 0; col < image.getWidth(); col++) {
 				int[] rgb = ColorUtils.intToRGB(getMiddleCopy().getRGB(col, row));
@@ -141,7 +141,7 @@ public class Image {
 		for (int row = 0; row < image.getHeight(); row++)
 			for (int col = 0; col < image.getWidth(); col++)
 				sum += ImageUtils.brightness(image.getRGB(col, row));
-		return sum / total;
+		return (double)sum / (double)total;
 	}
 	
 	public double contrast() {
@@ -155,11 +155,11 @@ public class Image {
         for(int num : aux)
             sum += num;
 
-        double mean = sum/aux.length;
+        double mean = (double)sum/(double)aux.length;
         for(int num: aux)
             standardDeviation += Math.pow(num - mean, 2);
         
-		return Math.sqrt(standardDeviation/aux.length);
+		return Math.sqrt((double)standardDeviation/(double)aux.length);
 	}
 	
 	public boolean isGrayscale() {
@@ -182,7 +182,7 @@ public class Image {
 				int[] rgb = ColorUtils.intToRGB(getMiddleCopy().getRGB(col, row));
 				for(int i = 0; i <rgb.length; i++) {
 					for (FunctionSegment segment : f) {
-						if (segment.getP1().getX() <= rgb[i]) {
+						if (segment.contains(rgb[i])) {
 							rgb[i] = ImageUtils.truncate((int) segment.f(rgb[i]));
 							break;
 						}
@@ -275,24 +275,15 @@ public class Image {
 		return aux;
 	}
 	
-	public void changeColorDepth1(int bits) {
-		int n = 8 - bits;
-		for (int row = 0; row < get().getHeight(); row++) {
-			for (int col = 0; col < get().getWidth(); col++) {
-				RGB value = new RGB(getMiddleCopy().getRGB(col, row));
-				RGB newColor = value.divide((int) Math.pow(2, n));
-				get().setRGB(col, row, newColor.toInt());
-			}
-		}
-	}
-	
-	public void changeColorDepth2(int bits) {
-		int length = 256 / bits;
-		for (int row = 0; row < get().getHeight(); row++) {
-			for (int col = 0; col < get().getWidth(); col++) {
-				RGB value = new RGB(getMiddleCopy().getRGB(col, row));
-				RGB newColor = value.approx(length);
-				get().setRGB(col, row, newColor.toInt());
+	public void changeColorDepth(int bits) {
+		int colors = (int) Math.pow(2, bits);
+		int length = 256/colors;
+		for (int row = 0; row < getMiddleCopy().getHeight(); row++) {
+			for (int col = 0; col < getMiddleCopy().getWidth(); col++) {
+				int preColor = getMiddleCopy().getRGB(col, row);
+				RGB preRGB = new RGB(preColor);
+				preRGB.approxMod(length);
+				image.setRGB(col, row, preRGB.toInt());
 			}
 		}
 	}

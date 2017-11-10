@@ -1,6 +1,7 @@
 package frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 
@@ -10,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+import object.RGB;
 import panels.PixelColorPanel;
 import panels.PropertiesFrame;
 import utils.ImageUtils;
@@ -255,7 +257,6 @@ public class MainFrame extends JFrame {
 		pack();
 		//setSize(getWidth() * 2, getHeight());
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(new FocusChangeListener());
-
 	}
 
 	class FocusChangeListener implements PropertyChangeListener {
